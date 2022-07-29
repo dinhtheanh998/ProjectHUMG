@@ -1,0 +1,63 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,500;0,700;1,400&family=Poppins:ital,wght@0,500;0,700;1,300&family=Quicksand:wght@300;400;600;700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-body;
+  }
+}
+
+@layer components {
+  .page-container {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .button-primary {
+    @apply w-full py-3 font-semibold text-white transition-all bg-black rounded-2xl hover:bg-slate-300 hover:text-black;
+  }
+
+
+  .nav-link {
+    @apply px-4 py-2 text-xl font-semibold bg-transparent cursor-pointer;
+  }
+  .nav-link-active {
+    @apply px-4 py-2 text-xl font-semibold bg-transparent cursor-pointer text-primary;
+  }
+  td,
+  th,
+  tr {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .nav-admin-link-active {
+    @apply flex items-center px-2 py-5 text-white cursor-pointer gap-x-2 bg-[#323335] rounded-xl
+  }
+  .nav-admin-link {
+    @apply flex items-center px-2 py-5 text-white cursor-pointer gap-x-2
+  }
+  // .sticky {
+  //   position: -webkit-sticky;
+  //   position: sticky;
+  // }
+}
+@layer utilities {
+  .scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 20px;
+  }
+
+  .scrollbar::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: rgb(209 213 219);
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    background: rgb(31 41 55);
+    border-radius: 100vh;
+    border: 1px solid rgb(31 41 55);
+  }
+}
