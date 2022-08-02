@@ -1,13 +1,16 @@
 const express = require("express");
 const cors = require("cors");
 var path = require("path");
-
+const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const db = require("./config/db/connectdb");
 require("./models/taskModel");
 global.Categories = require("./models/categoryModel");
 global.Product = require("./models/productModel");
+global.ProductInfo = require("./models/productInfoModel");
+global.returnRequest = require("./models/returnRequestModel");
+global.exchangeRequest = require("./models/exchangeRequest");
 global.ProductInfo = require("./models/productInfoModel");
 global.Order = require("./models/OrderModel");
 global.OrderDetails = require("./models/orderDetailsModel");
@@ -23,6 +26,7 @@ const port = 3001;
 const app = express();
 
 app.use(cors());
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 

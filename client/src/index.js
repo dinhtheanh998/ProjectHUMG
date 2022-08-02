@@ -4,29 +4,38 @@ import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import App from "./App";
 import Cart from "./components/Cart/Cart";
+import Login from "./components/Login-Logout/Login";
 import Base from "./components/pageBase/Base";
 import { CartProvider } from "./context/Cartcontext";
 import "./index.scss";
 import reportWebVitals from "./reportWebVitals";
+import { Provider } from "react-redux";
+import store from "./redux/store";
+import Request from "./components/requestClient/Request";
+import ReturnRequest from "./components/requestClient/ReturnRequest";
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
+
 root.render(
   <React.StrictMode>
-    <CartProvider>
-      <BrowserRouter>
-        <App />
-        <ToastContainer
-          position="top-right"
-          autoClose={1500}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-        />
-      </BrowserRouter>
-    </CartProvider>
+    <Provider store={store}>
+      <CartProvider>
+        <BrowserRouter>
+          <App />
+          <ToastContainer
+            position="top-right"
+            autoClose={1500}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
+        </BrowserRouter>
+      </CartProvider>
+    </Provider>
   </React.StrictMode>
 );
 

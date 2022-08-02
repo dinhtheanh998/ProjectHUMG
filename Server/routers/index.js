@@ -4,6 +4,7 @@ const productsRoutes = require("./productRoutes");
 const productInfoRoutes = require("./productInfoRoutes");
 const orderRoutes = require("./orderRoutes");
 const authRoutes = require("./authRoutes");
+const returnRequest = require("./returnRequestRoutes");
 function routes(app) {
   app.use("/api/category", cateRoutes);
   app.use("/api/tasks", taskRoutes);
@@ -11,6 +12,7 @@ function routes(app) {
   app.use("/api/productsInfo", productInfoRoutes);
   app.use("/api/order", orderRoutes);
   app.use("/api/auth", authRoutes);
+  app.use("/api/returnRequest", returnRequest);
 }
 
 module.exports = routes;

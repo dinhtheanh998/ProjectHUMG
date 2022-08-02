@@ -6,6 +6,7 @@
 @layer base {
   body {
     @apply font-body;
+    position: relative;
   }
 }
 
@@ -20,7 +21,6 @@
     @apply w-full py-3 font-semibold text-white transition-all bg-black rounded-2xl hover:bg-slate-300 hover:text-black;
   }
 
-
   .nav-link {
     @apply px-4 py-2 text-xl font-semibold bg-transparent cursor-pointer;
   }
@@ -34,10 +34,10 @@
     border-radius: 4px;
   }
   .nav-admin-link-active {
-    @apply flex items-center px-2 py-5 text-white cursor-pointer gap-x-2 bg-[#323335] rounded-xl
+    @apply flex items-center px-2 py-5 text-white cursor-pointer gap-x-2 bg-[#323335] rounded-xl;
   }
   .nav-admin-link {
-    @apply flex items-center px-2 py-5 text-white cursor-pointer gap-x-2
+    @apply flex items-center px-2 py-5 text-white cursor-pointer gap-x-2;
   }
   // .sticky {
   //   position: -webkit-sticky;
@@ -60,4 +60,29 @@
     border-radius: 100vh;
     border: 1px solid rgb(31 41 55);
   }
+}
+
+.custom-radio {
+  width: 10px;
+  height: 10px;
+  position: relative;
+}
+.custom-radio::after {
+  content: "";
+  width: 25px;
+  height: 25px;
+  border-radius: 100rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.custom-radio > div {
+  box-shadow: 0 0 0 5px #fff;
+}
+
+.custom-radio input:checked + div {
+  @apply bg-blue-500;
+  box-shadow: 0 0 0 2.5px #fff, 0 0 0 5px rgb(59 130 246 / var(--tw-bg-opacity));
 }

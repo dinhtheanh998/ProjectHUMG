@@ -3,12 +3,15 @@ import { useCart } from "../../context/Cartcontext";
 import axios from "axios";
 import { converCurences } from "../../config/config";
 import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 
 const Product = ({
   //
   data,
 }) => {
-  const [infoSize, setInfoSize] = useState();
+  // const [infoSize, setInfoSize] = useState();
+  const [color, setColor] = useState();
+  const [infoSize2, setInfoSize2] = useState();
   const [infoColor, setInfoColor] = useState();
   const proRef = useRef();
   const navigate = useNavigate();
@@ -20,20 +23,29 @@ const Product = ({
   const { addToCart } = useCart();
   useEffect(() => {
     axios
-      .get(`/api/productsInfo/product=${data._id}&distinct=size`)
-      .then((res) => {
-        setInfoSize(res.data);
-      });
-    axios
       .get(`/api/productsInfo/product=${data._id}&distinct=color`)
       .then((res) => {
         setInfoColor(res.data);
       });
   }, [data._id]);
+
+  useEffect(() => {
+    axios
+      .get(
+        `/api/productsInfo/getSizeFromColor/id=${data._id}&color=${color?.slice(
+          1
+        )}`
+      )
+      .then((res) => {
+        setInfoSize2(res?.data[0]?.size);
+      });
+  }, [color, data._id]);
   const handleGetInfo = (e) => {
     if (e.target.closest(".product-color")) {
       const index = +e.target.closest(".product-color").dataset.index;
       setActiveIndex(index);
+      setColor(e.target.closest(".product-color").dataset.color);
+      // console.log(e.target.closest(".product-color").dataset.color);
       setProductData((prev) => ({
         ...prev,
         color: e.target.closest(".product-color").dataset.color,
@@ -41,6 +53,7 @@ const Product = ({
       }));
     }
   };
+
   const handleClickProduct = (e) => {
     if (
       !proRef.current.contains(e.target.closest(".pro-size")) &&
@@ -66,13 +79,13 @@ const Product = ({
         />
 
         <div className="absolute bottom-0 flex flex-wrap items-center gap-2 px-3 py-3 text-white transition-all translate-y-full group-hover:visible group-hover:translate-y-0 pro-size">
-          {infoSize &&
-            infoSize.length > 0 &&
-            infoSize.map((size, i) => {
+          {infoSize2 &&
+            infoSize2.length > 0 &&
+            infoSize2.map((size, i) => {
               return (
                 <ProductSize
                   size={size}
-                  key={i}
+                  key={uuidv4()}
                   addToCart={addToCart}
                   data={productData}
                   activeIndex={activeIndex}
@@ -141,8 +154,8 @@ const ProductColor = ({ color, onClick, index, activeIndex }) => {
       data-color={color}
       onClick={onClick}
       data-index={index}
-      style={{ 
-        backgroundColor: color
+      style={{
+        backgroundColor: color,
       }}
     >
       {/* <span className="font-semibold ">{color}</span> */}

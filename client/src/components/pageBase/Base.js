@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useCart } from "../../context/Cartcontext";
+import Login from "../Login-Logout/Login";
 
 const Base = ({ children }) => {
   return (
-    <div>
+    <div className="relative">
       <Header></Header>
-      <div className="my-10 page-container">{<Outlet></Outlet>}</div>      
+      <div className="my-10 page-container">{<Outlet></Outlet>}</div>
       <Footer></Footer>
     </div>
   );
@@ -14,17 +15,24 @@ const Base = ({ children }) => {
 
 const Header = () => {
   const { cartItems, calcQuantity } = useCart();
+  const [loginShow, setLoginShow] = useState(false);
   // const countCartItems = cartItems.reduce((acc, item) => {
   //   return acc + item.quantity;
   // }, 0);
   // console.log(countCartItems);
   return (
-    <div className="">
+    <>
       <div className="w-full bg-black">
         <div className="flex items-center justify-between w-full h-12 text-white top-header page-container ">
           <a href="tel:0961494001">0961494001</a>
           <div className="flex items-center gap-x-5">
-            <span>Đăng Nhập</span>
+            <span
+              onClick={() => {
+                setLoginShow(true);
+              }}
+            >
+              Đăng Nhập
+            </span>
             <span>Đăng Ký</span>
           </div>
         </div>
@@ -54,10 +62,10 @@ const Header = () => {
               }
             >
               Sản phẩm
-            </NavLink>            
+            </NavLink>
           </li>
         </ul>
-        <div className="cart">          
+        <div className="cart">
           <NavLink to="/Cart" className="relative inline-block">
             <span className="w-[30px]">
               <svg
@@ -81,13 +89,16 @@ const Header = () => {
           </NavLink>
         </div>
       </nav>
-    </div>
+      {loginShow && (
+        <Login loginShow={loginShow} setLoginShow={setLoginShow}></Login>
+      )}
+    </>
   );
 };
 const Footer = () => {
   return (
     <>
-      <div className="py-10 bg-gray-300">
+      <div className="clear-both py-10 bg-gray-300">
         <div className="grid grid-cols-4 page-container footer gap-x-20 ">
           <div className="footer-contact">
             <p className="text-xl font-bold">Liên Hệ</p>
@@ -98,11 +109,11 @@ const Footer = () => {
             </div>
           </div>
           <div className="footer-contact">
-            <p className="text-xl font-bold">Liên Hệ</p>
+            <p className="text-xl font-bold">Chính sách đổi trả</p>
             <div className="info-footer">
-              <p>Địa chỉ:</p>
-              <p>Số Điện thoại</p>
-              <p>Email</p>
+              <NavLink to="chinh-sach-doi-tra">Chính sách đổi trả</NavLink>
+              {/* <p>Số Điện thoại</p>
+              <p>Email</p> */}
             </div>
           </div>
           <div className="footer-contact">

@@ -13,9 +13,13 @@ import ViewProductDetails from "./components/admin/productAdmin/ViewProductDetai
 import Cart from "./components/Cart/Cart";
 import CategoryForm from "./components/form/Category/CategoryForm";
 import Product from "./components/form/Product/Product";
+import Login from "./components/Login-Logout/Login";
 import Base from "./components/pageBase/Base";
 import Home from "./components/pageHome/Home";
 import ProductDetail from "./components/Product/ProductDetail";
+import ExchangeRequest from "./components/requestClient/ExchangeRequest";
+import Request from "./components/requestClient/Request";
+import ReturnRequest from "./components/requestClient/ReturnRequest";
 
 function App() {
   return (
@@ -30,6 +34,18 @@ function App() {
             element={<ProductDetail></ProductDetail>}
           ></Route>
           <Route path="cart" element={<Cart></Cart>}></Route>
+          <Route
+            path="chinh-sach-doi-tra"
+            element={<Request></Request>}
+          ></Route>
+          <Route
+            path="chinh-sach-doi-tra/tra-hang"
+            element={<ReturnRequest></ReturnRequest>}
+          ></Route>
+          <Route
+            path="chinh-sach-doi-tra/doi-hang"
+            element={<ExchangeRequest></ExchangeRequest>}
+          ></Route>
         </Route>
         <Route path="/admin" element={<BaseAdmin></BaseAdmin>}>
           <Route index element={<HomeAdmin></HomeAdmin>}></Route>
@@ -45,12 +61,11 @@ function App() {
           <Route
             path="ProductDetailsAdmin"
             element={<ProductDetailsAdmin></ProductDetailsAdmin>}
-          >            
-          </Route>
+          ></Route>
           <Route
-              path="ProductDetailsAdmin/:infoId"
-              element={<ViewProductDetails></ViewProductDetails>}
-            ></Route>
+            path="ProductDetailsAdmin/:infoId"
+            element={<ViewProductDetails></ViewProductDetails>}
+          ></Route>
           <Route
             path="ProductDetailsAdmin/add-productDetails"
             element={<CreateProductDetailAdmin></CreateProductDetailAdmin>}

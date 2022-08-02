@@ -7,7 +7,6 @@ const Cartcontext = createContext();
 const CartProvider = (props) => {
   const [storedValueCart, setValueCart] = useLocalStorage("cart", []);
   const [cartItems, setCartItems] = useState(storedValueCart);
-
   const calcQuantity = () => {
     return cartItems.reduce((acc, item) => {
       return acc + item.quantity;
@@ -110,7 +109,7 @@ const CartProvider = (props) => {
         });
       notify();
     }
-  }
+  };
 
   const removeToCart = (id, size, color) => {
     const cartListItem = JSON.parse(localStorage.getItem("cart"));
@@ -125,10 +124,13 @@ const CartProvider = (props) => {
     setQuantity(calcQuantity);
   };
 
-  const updateQuantityIncrement = (index, cartItems) => {
+  const updateQuantityIncrement = (index, cartItems, maxQuantity) => {
     cartItems[index] = {
       ...cartItems[index],
-      quantity: cartItems[index].quantity + 1,
+      quantity:
+        cartItems[index].quantity + 1 > maxQuantity
+          ? maxQuantity
+          : cartItems[index].quantity + 1,
     };
     setValueCart(cartItems);
     setQuantity(calcQuantity);
@@ -139,6 +141,17 @@ const CartProvider = (props) => {
     cartItems[index] = {
       ...cartItems[index],
       quantity: cartItems[index].quantity - 1,
+    };
+    setValueCart(cartItems);
+    setQuantity(calcQuantity);
+    setCartItems(cartItems);
+  };
+
+  const handleQuantityChange = (index, cartItems, quantity) => {
+    if (cartItems[index].quantity < 1) return;
+    cartItems[index] = {
+      ...cartItems[index],
+      quantity: +quantity,
     };
     setValueCart(cartItems);
     setQuantity(calcQuantity);
@@ -162,7 +175,8 @@ const CartProvider = (props) => {
     quantity,
     calcQuantity,
     totalPrice,
-    addToCartFromDetail
+    addToCartFromDetail,
+    handleQuantityChange,
   };
   return (
     <Cartcontext.Provider value={values} {...props}></Cartcontext.Provider>

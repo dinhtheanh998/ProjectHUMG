@@ -1,4 +1,5 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { converCurences } from "../../config/config";
 import DropDownHook from "../customForm/DropDownHook";
 
@@ -15,7 +16,20 @@ const CartItems = ({
   cartItems,
   updateQuantityIncrement,
   updateQuantityDecrement,
+  handleQuantityChange,
 }) => {
+  const [quantity, setQuantity] = useState(data.quantity);
+  const [maxQuantity, setMaxQuantity] = useState();
+  useEffect(() => {
+    const id = data._id;
+    const color = data.color.slice(1);
+    const size = data.size;
+    axios
+      .get(`/api/productsInfo/product=${id}&size=${size}&color=${color}`)
+      .then((res) => {
+        setMaxQuantity(res.data);
+      });
+  }, [quantity, data, maxQuantity, cartItems]);
   const handleClickSize = (index, e, cartItems) => {
     cartItems[index] = { ...cartItems[index], size: e.target.dataset.value };
     const newArray = Array.from(
@@ -33,9 +47,11 @@ const CartItems = ({
     setCartItems(newArray);
   };
 
-  const handleQuantityChange = (e) => {
-    console.log();
-  };
+  // const handleInputQuantityChange = (index, cartItems, e) => {
+  //   setQuantity(+e.target.value);
+
+  // };
+  // console.log(quantity);
   return (
     <>
       <div className="relative flex gap-3 mb-3">
@@ -80,7 +96,10 @@ const CartItems = ({
                     type="button"
                     aria-label="Decrement value"
                     className="w-[25px] flex items-center justify-center"
-                    onClick={() => updateQuantityDecrement(index, cartItems)}
+                    onClick={(e) => {
+                      console.log(maxQuantity);
+                      updateQuantityDecrement(index, cartItems, maxQuantity);
+                    }}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -96,9 +115,22 @@ const CartItems = ({
                     </svg>
                   </button>
                   <input
-                    onChange={(e) => handleQuantityChange(e)}
-                    value={data.quantity}
-                    // data-value={quantity}
+                    onChange={(e) => {
+                      setQuantity(+e.target.value);
+                      if (+e.target.value > maxQuantity) {
+                        setQuantity(maxQuantity);
+                      }
+                    }}
+                    onBlur={(e) => {
+                      handleQuantityChange(index, cartItems, e.target.value);
+                      if (e.target.value > maxQuantity) {
+                        setQuantity(maxQuantity);
+                      }
+                      console.log(+e.target.value, maxQuantity);
+                    }}
+                    // value={data.quantity}
+                    value={quantity}
+                    data-value={quantity}
                     className="w-[25px] outline-none border-none h-full text-center"
                   ></input>
                   <button
@@ -106,7 +138,7 @@ const CartItems = ({
                     type="button"
                     className="w-[25px] flex items-center justify-center"
                     onClick={(e) => {
-                      updateQuantityIncrement(index, cartItems);
+                      updateQuantityIncrement(index, cartItems, maxQuantity);
                     }}
                   >
                     <svg

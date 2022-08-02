@@ -27,11 +27,12 @@ exports.get_a_proInfo = (req, res) => {
     {
       productID: req.params.productID,
       size: req.params.size,
-      color: req.params.color,
+      color: `#${req.params.color}`,
     },
     (err, proInfo) => {
       if (err) res.send(err);
-      res.json(proInfo);
+      const { quantity, ...other } = proInfo[0];
+      res.json(quantity);
     }
   );
 };
@@ -72,29 +73,6 @@ exports.infoAggregate = (req, res) => {
 };
 
 exports.infoAggregateAProduct = (req, res) => {
-  // productInfo.find({productID: req.params.infoId},
-
-  // [
-  //   {
-  //     $group: {
-  //       _id: {
-  //         productID: "$productID",
-  //       },
-  //       count: { $sum: 1 },
-  //     },
-  //   },
-  // ],
-  // [
-  //   { $match: {_id : (req.params.infoId)}} ,
-  //   // {
-  //   //   // $group: {
-  //   //   //   _id: "$productID",
-  //   //   //   total: {
-  //   //   //     $sum: "$quantity",
-  //   //   //   },
-  //   //   // },
-  //   // },
-  // ],
   productInfo.aggregate(
     [
       {
@@ -110,6 +88,39 @@ exports.infoAggregateAProduct = (req, res) => {
       },
       {
         $unwind: "$productInfo",
+      },
+    ],
+    (err, proInfo) => {
+      if (err) res.send(err);
+      res.json(proInfo);
+    }
+  );
+};
+
+exports.getSizeFromColor = (req, res) => {
+  productInfo.aggregate(
+    [
+      {
+        $match: {
+          productID: new mongoose.Types.ObjectId(req.params.infoId),
+          color: `#${req.params.color}`,
+          // $and: [
+          //   {
+          //     // productID: new mongoose.Types.ObjectId(req.params.infoId),
+          //     productID: "62dba006b78ac7e166e69aec",
+          //   },
+          //   {
+          //     // color: req.params.color,
+          //     size: "S",
+          //   },
+          // ],
+        },
+      },
+      {
+        $group: {
+          _id: "$productID",
+          size: { $push: "$size" },
+        },
       },
     ],
     (err, proInfo) => {

@@ -1,7 +1,17 @@
-import React from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import React, { useEffect } from "react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import HomeAdmin from "./HomeAdmin/HomeAdmin";
+import { useSelector } from "react-redux";
 const BaseAdmin = () => {
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.login.currentUser);
+  console.log(user);
+  useEffect(() => {
+    if (!user) {
+      navigate("/");
+    }
+  }, []);
+
   return (
     <div className="page-container ">
       <div className="grid w-full h-screen grid-cols-10 shadow-xl">
@@ -56,8 +66,19 @@ const BaseAdmin = () => {
             }
           >
             <span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z"
+                />
               </svg>
             </span>
             <span className="text-white">Chi tiết sản phẩm</span>
@@ -104,12 +125,9 @@ const BaseAdmin = () => {
             </span>
             <span className="text-white">Đơn Hàng</span>
           </NavLink>
-          
-
         </div>
         <div className="h-full col-start-3 col-end-11 bg-[#f7f7f7] rounded-lg">
-          <Outlet>
-          </Outlet>
+          <Outlet></Outlet>
         </div>
       </div>
     </div>
