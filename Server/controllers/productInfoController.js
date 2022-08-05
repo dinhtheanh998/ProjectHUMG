@@ -37,6 +37,7 @@ exports.get_a_proInfo = (req, res) => {
   );
 };
 
+
 exports.infoAggregate = (req, res) => {
   // console.log(req.params.productID);
   productInfo.aggregate(
@@ -104,16 +105,6 @@ exports.getSizeFromColor = (req, res) => {
         $match: {
           productID: new mongoose.Types.ObjectId(req.params.infoId),
           color: `#${req.params.color}`,
-          // $and: [
-          //   {
-          //     // productID: new mongoose.Types.ObjectId(req.params.infoId),
-          //     productID: "62dba006b78ac7e166e69aec",
-          //   },
-          //   {
-          //     // color: req.params.color,
-          //     size: "S",
-          //   },
-          // ],
         },
       },
       {
@@ -125,6 +116,22 @@ exports.getSizeFromColor = (req, res) => {
     ],
     (err, proInfo) => {
       if (err) res.send(err);
+      res.json(proInfo);
+    }
+  );
+};
+
+exports.UpdateQuantity = (req, res) => {
+  productInfo.updateOne(
+    {
+      productID: new mongoose.Types.ObjectId(req.params.infoId),
+      color: `#${req.params.color}`,
+      size: req.params.size,
+    },
+    { $inc: { quantity: -req.params.quantity } },
+    (err, proInfo) => {
+      if (err) res.send(err);
+      console.log(proInfo);
       res.json(proInfo);
     }
   );

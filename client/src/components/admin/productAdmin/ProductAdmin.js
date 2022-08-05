@@ -5,6 +5,7 @@ import axios from "axios";
 import { converCurences, getAllProduct } from "../../../config/config";
 
 const ProductAdmin = () => {
+  const navigate = useNavigate();
   const [dataPro, setdataPro] = useState();
   const [showOption, setShowOption] = useState(null);
   useEffect(() => {
@@ -81,7 +82,9 @@ const ProductAdmin = () => {
                     <button
                       type="button"
                       className="py-2 px-4 bg-[#f7f7f7] border  border-gray-50 rounded-lg font-semibold hover:bg-blue-400 hover:text-white transition-all"
-                    >
+                      onClick={() => {
+                      navigate(`/admin/edit-product/${item._id}`);
+                    }}>
                       Sửa
                     </button>
                   </div>

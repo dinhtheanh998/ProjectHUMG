@@ -1,3 +1,4 @@
+import axios from "axios";
 import React from "react";
 import { useForm } from "react-hook-form";
 
@@ -8,7 +9,9 @@ const ExchangeRequest = () => {
     formState: { errors },
   } = useForm();
   const handleOnSubmit = (data) => {
-    console.log(data);
+    axios.post("/api/exchangeRequest", data).then((res) => { 
+      console.log(res);
+    })
   };
   return (
     <form
@@ -24,7 +27,7 @@ const ExchangeRequest = () => {
         />
       </div>
       <div className="flex flex-col mb-3 gap-y-3">
-        <label htmlFor="">Vui lòng nhập mã đặt hàng:</label>
+        <label htmlFor="">Vui lòng nhập mã đơn hàng:</label>
         <input
           {...register("OrderId")}
           type="text"

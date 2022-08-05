@@ -1,17 +1,20 @@
 import React, { useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import HomeAdmin from "./HomeAdmin/HomeAdmin";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
+import { logOut } from "../../redux/apiRequest";
 const BaseAdmin = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.login.currentUser);
-  console.log(user);
+  const dispatch = useDispatch();
   useEffect(() => {
     if (!user) {
       navigate("/");
     }
   }, []);
-
+  const handleLogout = () =>{
+    logOut(dispatch,navigate,);
+  }
   return (
     <div className="page-container ">
       <div className="grid w-full h-screen grid-cols-10 shadow-xl">
@@ -125,6 +128,73 @@ const BaseAdmin = () => {
             </span>
             <span className="text-white">Đơn Hàng</span>
           </NavLink>
+          <NavLink
+            to="returnRequest"
+            className={({ isActive }) =>
+              isActive ? "nav-admin-link-active" : "nav-admin-link"
+            }
+          >
+            <span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+            </span>
+            <span className="text-white">Trả hàng</span>
+          </NavLink>
+          <NavLink
+            to="exchangeRequest"
+            className={({ isActive }) =>
+              isActive ? "nav-admin-link-active" : "nav-admin-link"
+            }
+          >
+            <span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+            </span>
+            <span className="text-white">Đổi hàng</span>
+          </NavLink>
+          <button className="nav-admin-link" onClick={handleLogout}>
+            <span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
+              </svg>
+            </span>
+            <span className="text-white">Đăng xuất</span>
+          </button>
         </div>
         <div className="h-full col-start-3 col-end-11 bg-[#f7f7f7] rounded-lg">
           <Outlet></Outlet>

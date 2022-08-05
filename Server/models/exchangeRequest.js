@@ -3,15 +3,13 @@ const Schema = mongooose.Schema;
 
 const exchangeRequestSchema = new Schema(
   {
+    OrderId: {
+      type: String,
+    },    
     phone: {
       type: String,
       required: true,
-    },
-    OrderId: {
-      type: Schema.Types.ObjectId,
-      ref: "order",
-      required: true,
-    },
+    },    
     productFromCustomer: {
       type: String,
       required: true,

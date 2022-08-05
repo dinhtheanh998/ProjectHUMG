@@ -35,6 +35,7 @@ const ProductDetail = () => {
     });
   }, [sanphamid]);
 
+  console.log(infoProduct,sanphamid);
   useEffect(() => {
     setDataProduct({...dataProduct, quantity: quantity})
     // console.log({...dataProduct, quantity: quantity});

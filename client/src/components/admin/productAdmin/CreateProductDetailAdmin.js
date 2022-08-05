@@ -6,7 +6,7 @@ import BottomBodyAdm from "../BottomBodyAdm";
 import { v4 as uuidv4 } from "uuid";
 import DropDownCustom from "../../customForm/DropDownCustom";
 import DropDownCustom2 from "../../customForm/DropDownCustom2";
-import { notify } from "../../../config/config";
+import { notifySuccess } from "../../../config/config";
 import { useNavigate } from "react-router-dom";
 
 const dataSize = [
@@ -53,7 +53,7 @@ const CreateProductDetailAdmin = () => {
 
   const handleOnSubmit = (data) => {
     axios.post("/api/productsInfo", data).then((res) => {
-      if (res.status === 200) notify();
+      if (res.status === 200) notifySuccess("Thêm thành công");
       setTimeout(() => {
         navigate("/ProductDetailsAdmin/add-productDetails");
       }, 1500);

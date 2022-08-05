@@ -25,15 +25,29 @@ const Header = () => {
       <div className="w-full bg-black">
         <div className="flex items-center justify-between w-full h-12 text-white top-header page-container ">
           <a href="tel:0961494001">0961494001</a>
-          <div className="flex items-center gap-x-5">
+          <div className="flex items-center cursor-pointer gap-x-5">
             <span
               onClick={() => {
                 setLoginShow(true);
               }}
+              className="flex items-center gap-x-2"
             >
-              Đăng Nhập
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5 font-normal"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span className="font-semibold">Đăng nhập</span>
             </span>
-            <span>Đăng Ký</span>
           </div>
         </div>
       </div>

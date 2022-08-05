@@ -57,6 +57,46 @@ exports.read_a_product = (req, res) => {
     res.json(product);
   });
 };
+
+exports.getAProduct = (req, res) => {
+  product.aggregate(
+    [
+      {
+        $match: {
+          _id: mongoose.Types.ObjectId(req.params.productId),
+        },
+      },
+      {
+        $lookup: {
+          from: "category",
+          localField: "categories",
+          foreignField: "_id",
+          as: "categories",
+        },
+      },
+      {
+        $unwind: "$categories",
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          unitPrice: 1,
+          unitPromotionalPrice: 1,
+          "images": 1,
+          "description": 1,
+          "categories": "$categories.name",
+          "idCategories": "$categories._id",
+        },
+      }
+    ],
+    (err, product) => {
+      if (err) res.send(err);
+      res.json(...product);
+    }
+  );
+};
+
 // lấy theo thể loại
 exports.list_all_products_cate = (req, res) => {
   product
@@ -69,15 +109,43 @@ exports.list_all_products_cate = (req, res) => {
 };
 
 exports.update_a_product = (req, res) => {
-  product.findOneAndUpdate(
-    { _id: req.params.productId },
-    req.body,
-    { new: true },
-    (err, product) => {
-      if (err) res.send(err);
-      res.json(product);
-    }
-  );
+  if (req.file) {
+    product.findOneAndUpdate(
+      { _id: req.params.productId },
+      {
+        name: req.body.name,
+        unitPrice: req.body.unitPrice,
+        unitPromotionalPrice: req.body.unitPromotionalPrice,
+        images: req.file.filename,
+        description: req.body.description,
+        categories: req.body.categories,
+        suppliers: req.body.suppliers,
+      },
+      { new: true },
+      (err, product) => {
+        if (err) res.send(err);
+        res.json(product);
+      }
+    );
+  } else {
+    product.findOneAndUpdate(
+      { _id: req.params.productId },
+      {
+        name: req.body.name,
+        unitPrice: req.body.unitPrice,
+        unitPromotionalPrice: req.body.unitPromotionalPrice,       
+        description: req.body.description,
+        categories: req.body.categories,
+        suppliers: req.body.suppliers,
+      },
+      { new: true },
+      (err, product) => {
+        if (err) res.send(err);
+        res.json(product);
+      }
+    );
+  }
+  
 };
 
 exports.delete_a_product = (req, res) => {

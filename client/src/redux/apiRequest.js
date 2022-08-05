@@ -1,5 +1,5 @@
 import axios from "axios";
-import { loginFailed, loginStart, loginSuccess } from "./authSlice";
+import { loginFailed, loginStart, loginSuccess, logOutFailed, logOutStart, logOutSuccess } from "./authSlice";
 
 export const loginUser = async (user, dispatch, navigate) => {
   dispatch(loginStart());
@@ -11,5 +11,15 @@ export const loginUser = async (user, dispatch, navigate) => {
     // const res = await axios.post("/api/auth/login", user);
     // dispatch(loginFailed(res));
     return error.response.data;
+  }
+};
+export const logOut = async (dispatch, navigate) => {
+  dispatch(logOutStart());
+  try {
+    const res = await axios.post("/api/auth/logout");
+    dispatch(logOutSuccess());
+    navigate("/");
+  } catch (err) {
+    dispatch(logOutFailed());
   }
 };

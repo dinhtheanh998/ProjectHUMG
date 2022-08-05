@@ -70,12 +70,13 @@ const fakeData2 = [
 const CreateProduct = () => {
   const [imgData, setImgData] = useState(null);
   const [image, setImage] = useState(null);
+  const [cateData, setCateData] = useState();
+  const [supplierData, setSupplierData] = useState();
   const onChangePicture = (e) => {
     if (e.target.files[0]) {
       setImage(e.target.files[0]);
       const file = e.target.files[0];
       file.preview = URL.createObjectURL(file);
-
       setImgData(file);
     }
   };
@@ -91,6 +92,12 @@ const CreateProduct = () => {
     resolver: yupResolver(schema),
     // mode: "onBlur",
   });
+
+  useEffect(() => {
+    axios.get("/api/category").then((res) => {
+      setCateData(res.data);
+    })    
+  }, []);
 
   const handleOnSubmit = (data) => {
     const formData = new FormData();
@@ -159,7 +166,7 @@ const CreateProduct = () => {
             <label htmlFor="">Loại sản phẩm</label>
             <DropDownCustom
               control={control}
-              data={fakeData}
+              data={cateData}
               dropDownLabel="Chọn loại"
               setValue={setValue}
               name="categories"

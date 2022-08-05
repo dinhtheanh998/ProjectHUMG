@@ -10,31 +10,37 @@ import { CartProvider } from "./context/Cartcontext";
 import "./index.scss";
 import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
-import store from "./redux/store";
+import  { store,persistor } from "./redux/store";
 import Request from "./components/requestClient/Request";
 import ReturnRequest from "./components/requestClient/ReturnRequest";
+import { ThemeProvider } from "@material-tailwind/react";
+import { PersistGate } from 'redux-persist/integration/react'
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <React.StrictMode>
     <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>        
       <CartProvider>
-        <BrowserRouter>
-          <App />
-          <ToastContainer
-            position="top-right"
-            autoClose={1500}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
-        </BrowserRouter>
-      </CartProvider>
+        <ThemeProvider>
+          <BrowserRouter>
+            <App />
+            <ToastContainer
+              position="top-right"
+              autoClose={1500}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+            />
+          </BrowserRouter>
+        </ThemeProvider>
+        </CartProvider>
+    </PersistGate>        
     </Provider>
   </React.StrictMode>
 );

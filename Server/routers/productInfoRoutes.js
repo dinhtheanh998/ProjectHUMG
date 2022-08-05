@@ -25,4 +25,9 @@ router.get(
   "/getSizeFromColor/?id=:infoId&?color=:color",
   productInfoBuilder.getSizeFromColor
 );
+
+router.put(
+  "/updateQuantity/?id=:infoId&?color=:color&?size=:size&?quantity=:quantity",
+  productInfoBuilder.UpdateQuantity
+)
 module.exports = router;

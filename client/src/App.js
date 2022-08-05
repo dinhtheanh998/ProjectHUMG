@@ -4,12 +4,15 @@ import "./App.css";
 import BaseAdmin from "./components/admin/BaseAdmin";
 import CategoryAdmin from "./components/admin/categoryAdmin/CategoryAdmin";
 import HomeAdmin from "./components/admin/HomeAdmin/HomeAdmin";
-import OrderAdmin from "./components/admin/OrderAdmin";
+import OrderAdmin from "./components/admin/OrderAdmin/OrderAdmin";
 import CreateProduct from "./components/admin/productAdmin/CreateProduct";
 import CreateProductDetailAdmin from "./components/admin/productAdmin/CreateProductDetailAdmin";
+import EditProduct from "./components/admin/productAdmin/EditProduct";
 import ProductAdmin from "./components/admin/productAdmin/ProductAdmin";
 import ProductDetailsAdmin from "./components/admin/productAdmin/ProductDetailsAdmin";
 import ViewProductDetails from "./components/admin/productAdmin/ViewProductDetails";
+import ExchangeRequestAdmin from "./components/admin/RequestFromClient/ExchangeRequestAdmin";
+import ReturnRequestAdmin from "./components/admin/RequestFromClient/ReturnRequestAdmin";
 import Cart from "./components/Cart/Cart";
 import CategoryForm from "./components/form/Category/CategoryForm";
 import Product from "./components/form/Product/Product";
@@ -55,6 +58,10 @@ function App() {
             element={<ProductAdmin></ProductAdmin>}
           ></Route>
           <Route
+            path="edit-product/:productid"
+            element={<EditProduct></EditProduct>}
+          ></Route>
+          <Route
             path="product-Admin/add-product"
             element={<CreateProduct></CreateProduct>}
           ></Route>
@@ -79,6 +86,8 @@ function App() {
             element={<CategoryForm></CategoryForm>}
           ></Route>
           <Route path="OrderAdmin" element={<OrderAdmin></OrderAdmin>}></Route>
+          <Route path="returnRequest" element={<ReturnRequestAdmin></ReturnRequestAdmin>}></Route>
+          <Route path="exchangeRequest" element={<ExchangeRequestAdmin></ExchangeRequestAdmin>}></Route>
         </Route>
       </Routes>
     </Fragment>

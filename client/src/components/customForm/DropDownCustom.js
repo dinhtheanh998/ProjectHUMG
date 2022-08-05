@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useWatch } from "react-hook-form";
 import useClickOutSide from "../../hooks/useClickOutSide";
 
-const DropDownCustom = ({ control, setValue, name, data, dropDownLabel }) => {
+const DropDownCustom = ({ control, setValue, name, data, dropDownLabel, defaultLabelId }) => {
   const { show, setShow, showRef } = useClickOutSide();
   const [label, setLabel] = useState(dropDownLabel);
 
@@ -20,6 +20,11 @@ const DropDownCustom = ({ control, setValue, name, data, dropDownLabel }) => {
   useEffect(() => {
     if (dropDownValue === "") setLabel(dropDownLabel);
   }, [dropDownValue]);
+  
+  useEffect(() => { 
+    setValue(name,defaultLabelId)
+  },[])
+
   return (
     <div className="relative" ref={showRef}>
       <div
@@ -35,7 +40,7 @@ const DropDownCustom = ({ control, setValue, name, data, dropDownLabel }) => {
           show ? "" : "opacity-0 invisible"
         }`}
       >
-        {data.map((item) => {
+        {data?.map((item) => {
           return (
             <div
               className="p-5 bg-white cursor-pointer hover:bg-gray-100"

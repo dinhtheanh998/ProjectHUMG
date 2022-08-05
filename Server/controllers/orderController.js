@@ -43,3 +43,126 @@ exports.createOrder = (req, res) => {
   //     res.json(orderDetails)
   // })
 };
+
+exports.updateStateOrder = (req, res) => {
+  order.findByIdAndUpdate(
+    req.params.id,
+    { $set: { state: req.body.state } },
+    (err, order) => {
+      if (err) res.send(err);
+      res.json(order);
+    }
+  );
+};
+
+exports.getStatistical = (req, res) => {
+  order.aggregate(
+    [
+      {
+        $group: {
+          _id: "$state",
+          count: { $sum: 1 },
+        },
+      },
+    ],
+    (err, orders) => {
+      if (err) res.send(err);
+      res.json(orders);
+    }
+  );
+};
+
+exports.getProfitOrderNowMonth = (req, res) => {
+  order.aggregate(
+    [
+      {
+        $project: {
+          state: 1,
+          month: { $month: "$createdDate" },          
+          total: 1,
+        },
+      },
+      {
+        $match: {
+          state: "Thành công",
+          month: new Date().getMonth() + 1,
+        },
+      },
+      {
+        $group: {
+          _id: "$state",
+          total: { $sum: "$total" },
+        },
+      },
+    ],
+    (err, orders) => {
+      if (err) res.send(err);
+      const { total } = orders[0];
+      res.json(total);
+    }
+  );
+};
+
+exports.getProfitPerMonth = (req, res) => {
+  order
+    .aggregate(
+      [
+        {
+          $project: {
+            state: 1,
+            month: { $month: "$createdDate" },
+            day: { $dayOfMonth: "$createdDate" },
+            total: 1,
+          },
+        },
+        {
+          $match: {
+            state: "Thành công",
+            month: new Date().getMonth() + 1,
+          },
+        },
+        {
+          $group: {
+            _id: "$day",
+            "date": { $first: "$day" },
+            total: { $sum: "$total" },
+          },
+        },
+      ],
+      (err, orders) => {
+        if (err) res.send(err);
+        res.json(orders);
+      }
+    )
+    .sort({ _id: 1 });
+};
+
+exports.getProfitMonthly = (req, res) => { 
+  order.aggregate(
+    [
+      {
+        $project: {
+          state: 1,
+          month: { $month: "$createdDate" },
+          total: 1,
+        },
+      },
+      {
+        $match: {
+          state: "Thành công",          
+        },
+      },
+      {
+        $group: {
+          _id: "$month",
+          "Month": { $first: "$month" },
+          total: { $sum: "$total" },
+        },
+      },
+    ],
+    (err, orders) => {
+      if (err) res.send(err);
+      res.json(orders);
+    }
+  ).sort({ _id: 1 });;
+}
