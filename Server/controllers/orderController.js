@@ -44,6 +44,22 @@ exports.createOrder = (req, res) => {
   // })
 };
 
+exports.getOrderByCondition = (req, res) => {
+  order.aggregate(
+    [
+      {
+        $match: {
+          $or: [{ _id: mongoose.Types.ObjectId(req.params.orderId) }, { phone: req.params.phone }],
+        },
+      },
+    ],
+    (err, order) => {
+      if (err) res.send(err);
+      res.json(order);
+    }
+  );
+};
+
 exports.updateStateOrder = (req, res) => {
   order.findByIdAndUpdate(
     req.params.id,
@@ -78,7 +94,7 @@ exports.getProfitOrderNowMonth = (req, res) => {
       {
         $project: {
           state: 1,
-          month: { $month: "$createdDate" },          
+          month: { $month: "$createdDate" },
           total: 1,
         },
       },
@@ -124,7 +140,7 @@ exports.getProfitPerMonth = (req, res) => {
         {
           $group: {
             _id: "$day",
-            "date": { $first: "$day" },
+            date: { $first: "$day" },
             total: { $sum: "$total" },
           },
         },
@@ -137,32 +153,34 @@ exports.getProfitPerMonth = (req, res) => {
     .sort({ _id: 1 });
 };
 
-exports.getProfitMonthly = (req, res) => { 
-  order.aggregate(
-    [
-      {
-        $project: {
-          state: 1,
-          month: { $month: "$createdDate" },
-          total: 1,
+exports.getProfitMonthly = (req, res) => {
+  order
+    .aggregate(
+      [
+        {
+          $project: {
+            state: 1,
+            month: { $month: "$createdDate" },
+            total: 1,
+          },
         },
-      },
-      {
-        $match: {
-          state: "Thành công",          
+        {
+          $match: {
+            state: "Thành công",
+          },
         },
-      },
-      {
-        $group: {
-          _id: "$month",
-          "Month": { $first: "$month" },
-          total: { $sum: "$total" },
+        {
+          $group: {
+            _id: "$month",
+            Month: { $first: "$month" },
+            total: { $sum: "$total" },
+          },
         },
-      },
-    ],
-    (err, orders) => {
-      if (err) res.send(err);
-      res.json(orders);
-    }
-  ).sort({ _id: 1 });;
-}
+      ],
+      (err, orders) => {
+        if (err) res.send(err);
+        res.json(orders);
+      }
+    )
+    .sort({ _id: 1 });
+};
