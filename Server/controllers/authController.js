@@ -11,14 +11,12 @@ const authController = {
     try {
       const salt = await bcrypt.genSalt(10);
       const heshPassword = await bcrypt.hash(req.body.password, salt);
-
       //   create new user
       const newUser = new User({
         username: req.body.username,
         email: req.body.email,
         password: heshPassword,
       });
-
       //  save user to database
       const user = await newUser.save();
       res.status(200).json(user);
@@ -84,6 +82,34 @@ const authController = {
       return res.status(500).json(err);
     }
   },
+
+  requestRefreshToken: async (req, res) => {
+    //Take refresh token from user
+    const refreshToken = req.cookies.refreshToken;
+    //Send error if token is not valid
+    if (!refreshToken) return res.status(401).json("You're not authenticated");
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY, (err, user) => {
+      if (err) {
+        console.log(err);
+      }
+      refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
+      //create new access token, refresh token and send to user
+      const newAccessToken = authController.generateAccessToken(user);
+      const newRefreshToken = authController.generateRefreshToken(user);
+      refreshTokens.push(newRefreshToken);
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure:false,
+        path: "/",
+        sameSite: "strict",
+      });
+      res.status(200).json({
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      });
+    });
+  },
+
   //LOG OUT
   logOut: async (req, res) => {
     //Clear cookies when user logs out

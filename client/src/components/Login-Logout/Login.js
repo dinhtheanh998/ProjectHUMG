@@ -25,7 +25,7 @@ const Login = ({ loginShow = false, setLoginShow }) => {
     }
   };
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-5 modal">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-5 modal page-container">
       <div
         className={`fixed inset-0 z-50 flex items-center justify-center bg-black opacity-40 p-5  modal ${
           loginShow ? "" : "invisible opacity-0"

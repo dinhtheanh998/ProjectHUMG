@@ -1,36 +1,34 @@
 import axios from "axios";
 import { useEffect } from "react";
 
-export const options = {
-  // responsive: true,
-  plugins: {
-    legend: {
-      position: "bottom",
+export const options = (title) => {
+  return {
+    interaction: {
+      mode: 'index',
+      intersect: false,
     },
-    title: {
-      display: true,
-      text: "Doanh thu theo tháng",
+    stacked: false,
+    plugins: {
+      legend: {
+        position: "bottom",
+      },
+      title: {
+        display: true,
+        text: title,
+      },
     },
-  },
-  barThickness: 18,
-};
+    scales: {
+      y: {
+        type: 'linear',
+        display: true,
+        position: 'left',
+      },      
+    },
+    // responsive: true,
+  };
+}
 
-const labels = [
-  "Tháng 1",
-  "Tháng 2",
-  "Tháng 3",
-  "Tháng 4",
-  "Tháng 5",
-  "Tháng 6",
-  "Tháng 7",
-  "Tháng 8",
-  "Tháng 9",
-  "Tháng 10",
-  "Tháng 11",
-  "Tháng 12",
-];
-
-export const handleData = (data) => {
+export const handleData = (data, labels) => {
   if (!data) return;
   return labels
     .reduce((acc, curr, index) => {
@@ -46,14 +44,18 @@ export const handleData = (data) => {
     });
 };
 
-export const data = (xData) => {
+export const data = (xData, labels) => {
   return {
     labels,
     datasets: [
       {
         label: "Doanh số",
         data: xData,
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        backgroundColor: "rgba(243, 241, 245, 0.6)",
+        borderColor: '#66BFBF',        
+        yAxisID: 'y',
+        fill:true,
+        tension:0.5,
       },
     ],
   };

@@ -1,6 +1,7 @@
 import React, { Fragment } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
+import ManagerAccount from "./components/admin/accountAdmin/ManagerAccount";
 import BaseAdmin from "./components/admin/BaseAdmin";
 import CategoryAdmin from "./components/admin/categoryAdmin/CategoryAdmin";
 import HomeAdmin from "./components/admin/HomeAdmin/HomeAdmin";
@@ -15,8 +16,7 @@ import ExchangeRequestAdmin from "./components/admin/RequestFromClient/ExchangeR
 import ReturnRequestAdmin from "./components/admin/RequestFromClient/ReturnRequestAdmin";
 import Cart from "./components/Cart/Cart";
 import CategoryForm from "./components/form/Category/CategoryForm";
-import Product from "./components/form/Product/Product";
-import Login from "./components/Login-Logout/Login";
+import ProductPage from "./components/form/Product/ProductPage";
 import Base from "./components/pageBase/Base";
 import Home from "./components/pageHome/Home";
 import ProductDetail from "./components/Product/ProductDetail";
@@ -31,7 +31,7 @@ function App() {
         {/* Client Side */}
         <Route path="/" element={<Base></Base>}>
           <Route index element={<Home></Home>}></Route>
-          <Route path="/san-pham" element={<Product></Product>}></Route>
+          <Route path="/san-pham" element={<ProductPage></ProductPage>}></Route>
           <Route
             path="/san-pham/:sanphamid"
             element={<ProductDetail></ProductDetail>}
@@ -50,6 +50,7 @@ function App() {
             element={<ExchangeRequest></ExchangeRequest>}
           ></Route>
         </Route>
+        {/* admin side */}
         <Route path="/admin" element={<BaseAdmin></BaseAdmin>}>
           <Route index element={<HomeAdmin></HomeAdmin>}></Route>
           <Route path="home" element={<HomeAdmin></HomeAdmin>}></Route>
@@ -88,6 +89,7 @@ function App() {
           <Route path="OrderAdmin" element={<OrderAdmin></OrderAdmin>}></Route>
           <Route path="returnRequest" element={<ReturnRequestAdmin></ReturnRequestAdmin>}></Route>
           <Route path="exchangeRequest" element={<ExchangeRequestAdmin></ExchangeRequestAdmin>}></Route>
+          <Route path="account" element={<ManagerAccount></ManagerAccount>}></Route>          
         </Route>
       </Routes>
     </Fragment>

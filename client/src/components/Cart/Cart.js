@@ -39,15 +39,18 @@ const Cart = () => {
     updateQuantityIncrement,
     totalPrice,
     handleQuantityChange,
+    clearCart,
   } = useCart();
   const [infoSize, setInfoSize] = useState();
   const [infoColor, setInfoColor] = useState();
   const [submitData, setSubmitData] = useState();
+  const [reload, setReload] = useState(false);
   const {
     control,
     handleSubmit,
     setValue,
     setError,
+    register,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -76,22 +79,24 @@ const Cart = () => {
         });
     });
     // eslint-disable-nextLine react-hooks/exhaustive-deps
-  }, []);
+  }, [reload]);
   const handleSubmitOrder = (data) => {
     if (cartItems.length === 0) {
       setError("cart", { type: "custom", message: "Giỏ hàng đang trống" });
     } else {
       data = { ...data, total: totalPrice(), details: cartItems };
       axios.post("/api/order", data).then((res) => {
+        if (res.status === 200) {
+          clearCart();
+        }
         setSubmitData(res.data);
       });
     }
   };
-  console.log(submitData);
   return (
     <>
       {!submitData && (
-        <form className="" onSubmit={handleSubmit(handleSubmitOrder)}>
+        <form className="page-container" onSubmit={handleSubmit(handleSubmitOrder)}>
           <div className="grid grid-cols-2 gap-10">
             <div className="wrap-info-customer">
               <div className="grid w-full grid-cols-2 gap-x-5">
@@ -158,6 +163,38 @@ const Cart = () => {
                   {errors.address?.message}
                 </p>
               </div>
+              <div className="flex justify-center mb-5 gap-y-3 gap-x-5">
+                {/* <label htmlFor="address" className="font-semibold">
+              Địa chỉ
+            </label> */}
+                <div className="flex items-center gap-x-3">
+                  <input
+                    id="ShipCOD"
+                    {...register("paymentMethods")}
+                    value="Ship COD"
+                    placeholder=""
+                    // control={control}
+                    className="font-semibold rounded-2xl"
+                    type="radio"
+                  ></input>
+                  <label htmlFor="ShipCOD">Ship COD</label>
+                </div>
+                <div className="flex items-center gap-x-3">
+                  <input
+                    id="internetBanking"
+                    {...register("paymentMethods")}
+                    value="Internet Banking"
+                    placeholder=""
+                    control={control}
+                    className="font-semibold rounded-2xl"
+                    type="radio"
+                  ></input>
+                  <label htmlFor="internetBanking">Internet Banking</label>
+                </div>
+                <p className="text-sm text-red-500">
+                  {errors.address?.message}
+                </p>
+              </div>
               <div className="w-full mx-auto">
                 <button className="w-full py-3 font-semibold text-white transition-all bg-black rounded-2xl hover:bg-slate-300 hover:text-black">
                   Đặt Hàng
@@ -186,6 +223,8 @@ const Cart = () => {
                           updateQuantityIncrement={updateQuantityIncrement}
                           updateQuantityDecrement={updateQuantityDecrement}
                           handleQuantityChange={handleQuantityChange}
+                          reload={reload}
+                          setReload={setReload}
                         ></CartItems>
                       );
                     })}
@@ -477,7 +516,7 @@ const Cart = () => {
         </form>
       )}
       {submitData && (
-        <div className="flex mx-auto">          
+        <div className="flex mx-auto">
           <div className="flex flex-col mx-auto text-lg gap-y-5">
             <span>
               <strong>Mã đơn hàng:</strong> {submitData._id}
@@ -497,7 +536,9 @@ const Cart = () => {
             <span>
               <strong>Tổng tiền:</strong> {submitData.total}
             </span>
-          <p className="font-semibold">Bạn cố gắng nhớ mã đơn hàng để tiện cho việc đổi trả bạn nhé!!!</p>
+            <p className="font-semibold">
+              Bạn cố gắng nhớ mã đơn hàng để tiện cho việc đổi trả bạn nhé!!!
+            </p>
           </div>
         </div>
       )}

@@ -3,7 +3,16 @@ import React, { useEffect, useState } from "react";
 import { useWatch } from "react-hook-form";
 import useClickOutSide from "../../hooks/useClickOutSide";
 
-const DropDownCustomOrder = ({ control, setValue, name, data,item, dropDownLabel }) => {
+const DropDownCustomOrder = ({
+  control,
+  setValue,
+  name,
+  data,
+  item,
+  dropDownLabel,
+  search,
+  setSearchData,
+}) => {
   const { show, setShow, showRef } = useClickOutSide();
   const [label, setLabel] = useState(dropDownLabel);
 
@@ -15,25 +24,39 @@ const DropDownCustomOrder = ({ control, setValue, name, data,item, dropDownLabel
   // const handleUpdateQuantity
 
   const handleItemDropValue = (e) => {
-    
-    axios.put(`/api/order/${item._id}`, {state:e.target.dataset.value}).then((res) => { 
-      // console.log(res.data);
-    })
+    if (item) {
+      axios
+        .put(`/api/order/${item._id}`, { state: e.target.dataset.value })
+        .then((res) => {
+          // console.log(res.data);
+        });
 
-    if (e.target.dataset.value === "Thành công") {
-      item.details.forEach((el) => { 
-        // console.log(`/api/productsInfo/updateQuantity/id=${el._id}&color=${el.color.slice(1)}&size=${el.size}&quantity=${el.quantity}`);
-        axios.put(`/api/productsInfo/updateQuantity/id=${el._id}&color=${el.color.slice(1)}&size=${el.size}&quantity=${el.quantity}`)
+      if (e.target.dataset.value === "Thành công") {
+        item.details.forEach((el) => {
+          // console.log(`/api/productsInfo/updateQuantity/id=${el._id}&color=${el.color.slice(1)}&size=${el.size}&quantity=${el.quantity}`);
+          axios.put(
+            `/api/productsInfo/updateQuantity/id=${
+              el._id
+            }&color=${el.color.slice(1)}&size=${el.size}&quantity=${
+              el.quantity
+            }`
+          );
+        });
+      }
+    }
+    if (search) {
+      axios.get(`/api/order/getOrderByState/state=${e.target.dataset.value}`).then((res) => { 
+        setSearchData(res.data);
       })
     }
     setShow(false);
-    setLabel(e.target.textContent);    
+    setLabel(e.target.textContent);
   };
   useEffect(() => {
     if (dropDownValue === undefined) setLabel(dropDownLabel);
   }, [dropDownValue]);
   return (
-    <div className="relative " ref={showRef} >
+    <div className="relative w-full" ref={showRef}>
       <div
         className="flex items-center bg-white rounded-md cursor-pointer"
         onClick={() => {
@@ -53,7 +76,7 @@ const DropDownCustomOrder = ({ control, setValue, name, data,item, dropDownLabel
               className="z-[9999] p-2 bg-white cursor-pointer text-black hover:bg-gray-100 shadow-sm"
               onClick={handleItemDropValue}
               data-value={item.value}
-              key={item.id}             
+              key={item.id}
             >
               {item.name}
             </div>

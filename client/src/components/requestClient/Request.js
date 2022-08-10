@@ -20,7 +20,7 @@ const Request = () => {
             <p>Do đó 9Eight sẽ viết ngắn gọn nhất có thể, cơ bản là:</p>
             <p>
               - Khách hàng <strong> được đổi hoặc trả</strong> sản phẩm
-              <strong>trong vòng 15 ngày</strong> kể từ ngày nhận được sản phẩm.
+              <strong>trong vòng 3 ngày</strong> kể từ ngày nhận được sản phẩm.
             </p>
             <p>
               - Bất kỳ sản phẩm nào đặt mua tại 9Eight (sản phẩm được sale, sản

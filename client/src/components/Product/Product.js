@@ -4,6 +4,7 @@ import axios from "axios";
 import { converCurences } from "../../config/config";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
+import ProductSleketon from "./ProductSleketon";
 
 const Product = ({
   //
@@ -16,20 +17,24 @@ const Product = ({
   const proRef = useRef();
   const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [productData, setProductData] = useState({
     ...data,
   });
 
   const { addToCart } = useCart();
-  useEffect(() => {
+  useLayoutEffect(() => {
+    setLoading(true);
     axios
       .get(`/api/productsInfo/product=${data._id}&distinct=color`)
       .then((res) => {
         setInfoColor(res.data);
+        setLoading(false);
       });
   }, [data._id]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    setLoading(true);
     axios
       .get(
         `/api/productsInfo/getSizeFromColor/id=${data._id}&color=${color?.slice(
@@ -38,6 +43,7 @@ const Product = ({
       )
       .then((res) => {
         setInfoSize2(res?.data[0]?.size);
+        setLoading(false);
       });
   }, [color, data._id]);
   const handleGetInfo = (e) => {
@@ -64,68 +70,76 @@ const Product = ({
 
   return (
     <div
-      className="relative p-2 overflow-hidden bg-white rounded-lg cursor-pointer product-wrap"
+      className="relative p-2 overflow-hidden bg-white rounded-lg cursor-pointer product-wrap page-container"
       onClick={(e) => {
         // navigate(`/san-pham/${data._id}`);
         handleClickProduct(e);
       }}
       ref={proRef}
     >
-      <div className="relative w-full mb-4 overflow-hidden rounded-lg group">
-        <img
-          src={`/images/${data.images}`}
-          alt=""
-          className="w-full h-[350px] object-cover"
-        />
+      {loading && <ProductSleketon></ProductSleketon>}
+      {!loading && (
+        <>
+          <div className="relative w-full mb-4 overflow-hidden rounded-lg group">
+            <div className="w-full h-[350px]">
+              <img
+                src={`/images/${data.images}`}
+                alt=""
+                className="object-cover w-full h-full"
+              />
+            </div>
 
-        <div className="absolute bottom-0 flex flex-wrap items-center gap-2 px-3 py-3 text-white transition-all translate-y-full group-hover:visible group-hover:translate-y-0 pro-size">
-          {infoSize2 &&
-            infoSize2.length > 0 &&
-            infoSize2.map((size, i) => {
-              return (
-                <ProductSize
-                  size={size}
-                  key={uuidv4()}
-                  addToCart={addToCart}
-                  data={productData}
-                  activeIndex={activeIndex}
-                ></ProductSize>
-              );
-            })}
-        </div>
-      </div>
-      <div className="flex items-center gap-x-3 pro-color">
-        {infoColor &&
-          infoColor.length > 0 &&
-          infoColor.map((color, i) => {
-            return (
-              <ProductColor
-                color={color}
-                key={i}
-                onClick={handleGetInfo}
-                index={i}
-                activeIndex={activeIndex}
-              ></ProductColor>
-            );
-          })}
-      </div>
-      <h3 className="font-semibold text-black">{data.name}</h3>
-      <div className="flex items-center gap-x-3">
-        <span className="text-sm font-semibold new-product-price text-primary">
-          {converCurences(data.unitPromotionalPrice) + `đ`}
-        </span>
-        <span className="text-sm font-semibold text-gray-600 line-through old-product-price">
-          {converCurences(data.unitPrice) + `đ`}
-        </span>
-        <span className="text-sm font-semibold text-red-500 product-discount">
-          {"-" +
-            Math.round(
-              ((data.unitPrice - data.unitPromotionalPrice) / data.unitPrice) *
-                100
-            ) +
-            "%"}
-        </span>
-      </div>
+            <div className="absolute bottom-0 flex flex-wrap items-center gap-2 px-3 py-3 text-white transition-all translate-y-full group-hover:visible group-hover:translate-y-0 pro-size">
+              {infoSize2 &&
+                infoSize2.length > 0 &&
+                infoSize2.map((size, i) => {
+                  return (
+                    <ProductSize
+                      size={size}
+                      key={uuidv4()}
+                      addToCart={addToCart}
+                      data={productData}
+                      activeIndex={activeIndex}
+                    ></ProductSize>
+                  );
+                })}
+            </div>
+          </div>
+          <div className="flex items-center gap-x-3 pro-color">
+            {infoColor &&
+              infoColor.length > 0 &&
+              infoColor.map((color, i) => {
+                return (
+                  <ProductColor
+                    color={color}
+                    key={i}
+                    onClick={handleGetInfo}
+                    index={i}
+                    activeIndex={activeIndex}
+                  ></ProductColor>
+                );
+              })}
+          </div>
+          <h3 className="font-semibold text-black">{data.name}</h3>
+          <div className="flex items-center gap-x-3">
+            <span className="text-sm font-semibold new-product-price text-primary">
+              {converCurences(data.unitPromotionalPrice) + `đ`}
+            </span>
+            <span className="text-sm font-semibold text-gray-600 line-through old-product-price">
+              {converCurences(data.unitPrice) + `đ`}
+            </span>
+            <span className="text-sm font-semibold text-red-500 product-discount">
+              {"-" +
+                Math.round(
+                  ((data.unitPrice - data.unitPromotionalPrice) /
+                    data.unitPrice) *
+                    100
+                ) +
+                "%"}
+            </span>
+          </div>
+        </>
+      )}
     </div>
   );
 };
@@ -148,8 +162,8 @@ const ProductSize = ({ size, addToCart, data, activeIndex }) => {
 const ProductColor = ({ color, onClick, index, activeIndex }) => {
   return (
     <div
-      className={`px-4 py-2 mb-2 border border-gray-100 rounded-lg cursor-pointer product-color ${
-        activeIndex === index ? " border-blue-500 border-2" : ""
+      className={`px-4 py-2 mb-2 border  rounded-lg cursor-pointer product-color ${
+        activeIndex === index ? " border-blue-500 border-2" : "border-gray-500"
       }`}
       data-color={color}
       onClick={onClick}

@@ -34,6 +34,63 @@ exports.list_all_products = (req, res) => {
   });
 };
 
+exports.getAllProduct = (req, res) => {
+  product
+    .aggregate(
+      [
+        {
+          $lookup: {
+            from: "category",
+            localField: "categories",
+            foreignField: "_id",
+            as: "categories",
+          },
+        },
+        {
+          $lookup: {
+            from: "productInfo",
+            localField: "_id",
+            foreignField: "productID",
+            as: "productInfo",
+          },
+        },
+        {
+          $unwind: "$categories",
+        },
+        {
+          $unwind: "$productInfo",
+        },
+        {
+          $group: {
+            _id: "$_id",
+            name: { $first: "$name" },
+            unitPrice: { $first: "$unitPrice" },
+            unitPromotionalPrice: { $first: "$unitPromotionalPrice" },
+            images: { $first: "$images" },
+            categories: { $first: "$categories" },
+            productInfo: { $push: "$productInfo" },
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            unitPrice: 1,
+            unitPromotionalPrice: 1,
+            images: 1,
+            categories: 1,
+            productInfo: 1,
+          },
+        },
+      ],
+      (err, products) => {
+        if (err) res.send(err);
+        res.json(products);
+      }
+    )
+    .sort({ name: 1 });
+};
+
 exports.create_a_product = (req, res) => {
   console.log(req.file);
   const newProduct = new product({
@@ -83,12 +140,12 @@ exports.getAProduct = (req, res) => {
           name: 1,
           unitPrice: 1,
           unitPromotionalPrice: 1,
-          "images": 1,
-          "description": 1,
-          "categories": "$categories.name",
-          "idCategories": "$categories._id",
+          images: 1,
+          description: 1,
+          categories: "$categories.name",
+          idCategories: "$categories._id",
         },
-      }
+      },
     ],
     (err, product) => {
       if (err) res.send(err);
@@ -99,13 +156,52 @@ exports.getAProduct = (req, res) => {
 
 // lấy theo thể loại
 exports.list_all_products_cate = (req, res) => {
-  product
-    .find({ categories: req.params.cateId })
-    .populate("categories")
-    .exec((err, product) => {
+  product.aggregate(
+    [
+      {
+        $match: {
+          categories: mongoose.Types.ObjectId(req.params.cateId),
+        },
+
+      },
+      {
+        $lookup: {
+          from: "category",
+          localField: "categories",
+          foreignField: "_id",
+          as: "categories",
+        }
+      },
+      {
+        $lookup: {
+          from: "productInfo",
+          localField: "_id",
+          foreignField: "productID",
+          as: "productInfo",
+        }
+      },
+      {
+        $unwind: "$categories",
+      },
+      { $unwind: "$productInfo" },
+      {
+        $group: {
+          _id: "$_id",
+          name: { $first: "$name" },
+          unitPrice: { $first: "$unitPrice" },
+          unitPromotionalPrice: { $first: "$unitPromotionalPrice" },
+          images: { $first: "$images" },
+          categories: { $first: "$categories" },
+          productInfo: { $push: "$productInfo" },
+        },
+      },
+      
+    ],
+    (err, product) => {
       if (err) res.send(err);
       res.json(product);
-    });
+    }
+  );
 };
 
 exports.update_a_product = (req, res) => {
@@ -133,7 +229,7 @@ exports.update_a_product = (req, res) => {
       {
         name: req.body.name,
         unitPrice: req.body.unitPrice,
-        unitPromotionalPrice: req.body.unitPromotionalPrice,       
+        unitPromotionalPrice: req.body.unitPromotionalPrice,
         description: req.body.description,
         categories: req.body.categories,
         suppliers: req.body.suppliers,
@@ -145,7 +241,6 @@ exports.update_a_product = (req, res) => {
       }
     );
   }
-  
 };
 
 exports.delete_a_product = (req, res) => {
@@ -158,6 +253,186 @@ exports.delete_a_product = (req, res) => {
   });
 };
 
+exports.findProductByQuery = (req, res) => {
+  console.log(req.params.query);
+  if (
+    req.params.query == "" ||
+    req.params.query == undefined ||
+    req.params.query == null
+  ) {
+    product
+      .aggregate(
+        [
+          {
+            $lookup: {
+              from: "category",
+              localField: "categories",
+              foreignField: "_id",
+              as: "categories",
+            },
+          },
+          {
+            $lookup: {
+              from: "productInfo",
+              localField: "_id",
+              foreignField: "productID",
+              as: "productInfo",
+            },
+          },
+          {
+            $unwind: "$categories",
+          },
+          {
+            $unwind: "$productInfo",
+          },
+          {
+            $group: {
+              _id: "$_id",
+              name: { $first: "$name" },
+              unitPrice: { $first: "$unitPrice" },
+              unitPromotionalPrice: { $first: "$unitPromotionalPrice" },
+              images: { $first: "$images" },
+              categories: { $first: "$categories" },
+              productInfo: { $push: "$productInfo" },
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              unitPrice: 1,
+              unitPromotionalPrice: 1,
+              images: 1,
+              categories: 1,
+              productInfo: 1,
+            },
+          },
+        ],
+        (err, products) => {
+          if (err) res.send(err);
+          res.json(products);
+        }
+      )
+      .sort({ name: 1 });
+  } else {
+    product
+      .aggregate(
+        [
+          {
+            $match: { name: new RegExp(req.params.query, "i") },
+          },
+          {
+            $lookup: {
+              from: "category",
+              localField: "categories",
+              foreignField: "_id",
+              as: "categories",
+            },
+          },
+          {
+            $lookup: {
+              from: "productInfo",
+              localField: "_id",
+              foreignField: "productID",
+              as: "productInfo",
+            },
+          },
+          {
+            $unwind: "$categories",
+          },
+          {
+            $unwind: "$productInfo",
+          },
+          {
+            $group: {
+              _id: "$_id",
+              name: { $first: "$name" },
+              unitPrice: { $first: "$unitPrice" },
+              unitPromotionalPrice: { $first: "$unitPromotionalPrice" },
+              images: { $first: "$images" },
+              categories: { $first: "$categories" },
+              productInfo: { $push: "$productInfo" },
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              unitPrice: 1,
+              unitPromotionalPrice: 1,
+              images: 1,
+              categories: 1,
+              productInfo: 1,
+            },
+          },
+        ],
+        (err, products) => {
+          if (err) res.send(err);
+          res.json(products);
+        }
+      )
+      .sort({ name: 1 });
+  }
+};
+
+exports.getAllProductByPrice = (req, res) => { 
+  console.log("Get product by price");
+  product.aggregate([
+    {
+      $match: {
+        unitPrice: { $gte: 0 ,$lte: + req.params.maxPrice },
+      }
+    },
+    {
+      $lookup: {
+        from: "category",
+        localField: "categories",
+        foreignField: "_id",
+        as: "categories",
+      },
+    },
+    {
+      $lookup: {
+        from: "productInfo",
+        localField: "_id",
+        foreignField: "productID",
+        as: "productInfo",
+      },
+    },
+    {
+      $unwind: "$categories",
+    },
+    {
+      $unwind: "$productInfo",
+    },
+    {
+      $group: {
+        _id: "$_id",
+        name: { $first: "$name" },
+        unitPrice: { $first: "$unitPrice" },
+        unitPromotionalPrice: { $first: "$unitPromotionalPrice" },
+        images: { $first: "$images" },
+        categories: { $first: "$categories" },
+        productInfo: { $push: "$productInfo" },
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        unitPrice: 1,
+        unitPromotionalPrice: 1,
+        images: 1,
+        categories: 1,
+        productInfo: 1,
+      },
+    },
+    
+  ], (err, products) => { 
+    if (err) res.send(err);
+    res.json(products);
+  }).sort({ unitPrice: -1 });
+}
 // exports.sumQuantity = (req, res) => {
 //   product.aggregate(
 //     [

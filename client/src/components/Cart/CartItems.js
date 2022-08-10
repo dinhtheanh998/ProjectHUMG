@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { converCurences } from "../../config/config";
+import { converCurences, notifyWarn } from "../../config/config";
 import DropDownHook from "../customForm/DropDownHook";
 
 const CartItems = ({
@@ -17,9 +17,12 @@ const CartItems = ({
   updateQuantityIncrement,
   updateQuantityDecrement,
   handleQuantityChange,
+  reload,
+  setReload,
 }) => {
   const [quantity, setQuantity] = useState(data.quantity);
   const [maxQuantity, setMaxQuantity] = useState();
+
   useEffect(() => {
     const id = data._id;
     const color = data.color.slice(1);
@@ -30,21 +33,47 @@ const CartItems = ({
         setMaxQuantity(res.data);
       });
   }, [quantity, data, maxQuantity, cartItems]);
-  const handleClickSize = (index, e, cartItems) => {
-    cartItems[index] = { ...cartItems[index], size: e.target.dataset.value };
-    const newArray = Array.from(
-      new Set(cartItems.map((el) => JSON.stringify(el)))
-    ).map((el) => JSON.parse(el));
-    setValueCart(newArray);
-    setCartItems(newArray);
+  const handleClickSize = async (index, e, cartItems) => {
+    console.log(cartItems[index], e.target.dataset.value);
+    const info = await axios.get(
+      `/api/productsInfo/checkProductQuantity/id=${
+        cartItems[index]._id
+      }&color=${cartItems[index].color.slice(1)}&size=${e.target.dataset.value}`
+    );
+    if (info.data.length > 0 && info.data[0].quantity > 0) {
+      cartItems[index] = { ...cartItems[index], size: e.target.dataset.value };
+      const newArray = Array.from(
+        new Set(cartItems.map((el) => JSON.stringify(el)))
+      ).map((el) => JSON.parse(el));
+      setValueCart(newArray);
+      setCartItems(newArray);
+    } else {
+      notifyWarn("Mặt hàng không có sẵn");
+      setValueCart(cartItems);
+      setCartItems(cartItems);
+      setReload(!reload);
+    }
   };
-  const handleClickColor = (index, e, cartItems) => {
-    cartItems[index] = { ...cartItems[index], color: e.target.dataset.value };
-    const newArray = Array.from(
-      new Set(cartItems.map((el) => JSON.stringify(el)))
-    ).map((el) => JSON.parse(el));
-    setValueCart(newArray);
-    setCartItems(newArray);
+  const handleClickColor = async (index, e, cartItems) => {
+    console.log(cartItems[index], e.target.dataset.value);
+    const info = await axios.get(
+      `/api/productsInfo/checkProductQuantity/id=${
+        cartItems[index]._id
+      }&color=${e.target.dataset.value.slice(1)}&size=${cartItems[index].size}`
+    );
+    if (info.data.length > 0 && info.data[0].quantity > 0) {
+      cartItems[index] = { ...cartItems[index], color: e.target.dataset.value };
+      const newArray = Array.from(
+        new Set(cartItems.map((el) => JSON.stringify(el)))
+      ).map((el) => JSON.parse(el));
+      setValueCart(newArray);
+      setCartItems(newArray);
+    } else {
+      notifyWarn("Mặt hàng không có sẵn");
+      setValueCart(cartItems);
+      setCartItems(cartItems);
+      setReload(!reload);
+    }
   };
 
   // const handleInputQuantityChange = (index, cartItems, e) => {

@@ -45,11 +45,23 @@ exports.createOrder = (req, res) => {
 };
 
 exports.getOrderByCondition = (req, res) => {
+  console.log(req.params.query);
+  if (req.params.query.length <= 10) {
+    req.params.query = req.params.query;
+  } else {
+    req.params.query = mongoose.Types.ObjectId(req.params.query);
+  }
+  if (req.params.query == "" || req.params.query == undefined) {
+    order.find({}, (err, orders) => {
+      if (err) res.send(err);
+      res.json(orders);
+    });
+  }
   order.aggregate(
     [
       {
         $match: {
-          $or: [{ _id: mongoose.Types.ObjectId(req.params.orderId) }, { phone: req.params.phone }],
+          $or: [{ _id: req.params.query }, { phone: req.params.query }],
         },
       },
     ],
@@ -89,34 +101,43 @@ exports.getStatistical = (req, res) => {
 };
 
 exports.getProfitOrderNowMonth = (req, res) => {
-  order.aggregate(
-    [
-      {
-        $project: {
-          state: 1,
-          month: { $month: "$createdDate" },
-          total: 1,
+  order
+    .aggregate(
+      [
+        {
+          $project: {
+            state: 1,
+            month: { $month: "$updatedAt" },
+            total: 1,
+          },
         },
-      },
-      {
-        $match: {
-          state: "Thành công",
-          month: new Date().getMonth() + 1,
+        {
+          $match: {
+            month: new Date().getMonth() + 1,
+          },
         },
-      },
-      {
-        $group: {
-          _id: "$state",
-          total: { $sum: "$total" },
+        {
+          $group: {
+            _id: "$state",
+            total: { $sum: "$total" },
+            count: { $sum: 1 },
+          },
         },
-      },
-    ],
-    (err, orders) => {
-      if (err) res.send(err);
-      const { total } = orders[0];
-      res.json(total);
-    }
-  );
+        {
+          $project: {
+            state: "$_id",
+            total: 1,
+            count: 1,
+          },
+        },
+      ],
+      (err, orders) => {
+        if (err) res.send("Không có đơn hàng thành công");
+        const { total } = orders[0];
+        res.json(orders);
+      }
+    )
+    .sort({ _id: 1 });
 };
 
 exports.getProfitPerMonth = (req, res) => {
@@ -126,8 +147,8 @@ exports.getProfitPerMonth = (req, res) => {
         {
           $project: {
             state: 1,
-            month: { $month: "$createdDate" },
-            day: { $dayOfMonth: "$createdDate" },
+            month: { $month: "$updatedAt" },
+            day: { $dayOfMonth: "$updatedAt" },
             total: 1,
           },
         },
@@ -160,7 +181,7 @@ exports.getProfitMonthly = (req, res) => {
         {
           $project: {
             state: 1,
-            month: { $month: "$createdDate" },
+            month: { $month: "$updatedAt" },
             total: 1,
           },
         },
@@ -183,4 +204,59 @@ exports.getProfitMonthly = (req, res) => {
       }
     )
     .sort({ _id: 1 });
+};
+
+exports.getOrderByState = (req, res) => {
+  order.aggregate(
+    [
+      {
+        $match: {
+          state: req.params.state,
+        },
+      },
+    ],
+    (err, order) => {
+      if (err) res.send(err);
+      res.json(order);
+    }
+  );
+};
+
+exports.testQuery = (req, res) => {
+  order.aggregate(
+    [
+      {
+        $match: {
+          state: "Thành công",          
+        },
+      },      
+      {
+        $group: {
+          _id: "$details._id",
+          fullName: { $first: "$details.name" },
+          unitPromotionalPrice: { $push: "$details.unitPromotionalPrice" },
+          // name:{$push :"$fullName"},
+          // quantity: { $push: "$details.quantity" },
+        },
+      },
+      {
+        $unwind: "$_id",
+      },
+      {
+        $unwind: "$fullName",
+      },
+      
+      // {
+      //   $match: {
+      //     _id: mongoose.Types.ObjectId("62ee79d32670e798111e62b1"),
+      //   }
+      // }
+      
+      
+    ],
+    (err, order) => {
+      if (err) res.send(err);
+      res.json(order);
+    }
+  );
 };

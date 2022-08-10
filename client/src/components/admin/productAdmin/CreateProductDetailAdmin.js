@@ -55,7 +55,7 @@ const CreateProductDetailAdmin = () => {
     axios.post("/api/productsInfo", data).then((res) => {
       if (res.status === 200) notifySuccess("Thêm thành công");
       setTimeout(() => {
-        navigate("/ProductDetailsAdmin/add-productDetails");
+        navigate("/admin/ProductDetailsAdmin");
       }, 1500);
     });
   };

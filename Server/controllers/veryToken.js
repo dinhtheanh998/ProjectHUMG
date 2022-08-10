@@ -19,28 +19,30 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// const verifyTokenAndUserAuthorization = (req, res, next) => {
-//   verifyToken(req, res, () => {
-//     if (req.user.id === req.params.id || req.user.isAdmin) {
-//       next();
-//     } else {
-//       res.status(403).json("You're not allowed to do that!");
-//     }
-//   });
-// };
+const verifyTokenAndUserAuthorization = (req, res, next) => {
+  console.log(req.user,req.params);
+  verifyToken(req, res, () => {
+    if (req.user.id === req.params.id || req.user.isAdmin) {
+      next();
+    } else {
+      res.status(403).json("Bạn không có quyền làm điều này");
+    }
+  });
+};
 
 const verifyTokenAndAdmin = (req, res, next) => {
   verifyToken(req, res, () => {
     if (req.user.isAdmin) {
+      console.log("pass");
       next();
     } else {
-      return res.status(403).json("You're not allowed to do that!");
+      return res.status(403).json("Bạn không có quyền làm điều này");
     }
   });
 };
 
 module.exports = {
   verifyToken,
-  // verifyTokenAndUserAuthorization,
+  verifyTokenAndUserAuthorization,
   verifyTokenAndAdmin,
 };

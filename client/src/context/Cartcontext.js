@@ -164,6 +164,11 @@ const CartProvider = (props) => {
     }, 0);
   };
 
+  const clearCart = () => { 
+    setValueCart([]);
+    setCartItems([]);
+    localStorage.removeItem("cart");
+  }
   const values = {
     addToCart,
     cartItems,
@@ -177,6 +182,7 @@ const CartProvider = (props) => {
     totalPrice,
     addToCartFromDetail,
     handleQuantityChange,
+    clearCart,
   };
   return (
     <Cartcontext.Provider value={values} {...props}></Cartcontext.Provider>

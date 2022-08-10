@@ -36,17 +36,17 @@ POST http://localhost:3001/api/auth/register HTTP/1.1
 content-type: application/json
 
 {
-    "email": "dinhtheanh1988@gmail.com",
-    "password": "123456789",
-    "username": "dinhtheem"
+    "email": "themme@gmail.com",
+    "password": "123456",
+    "username": "theme"
 }
 
 ### Post Base
 POST http://localhost:3001/api/auth/login HTTP/1.1
 content-Type: application/json
 
-{    
-    "username": "dinhtheanh",
+{   
+    "username": "abc98123",
     "password": "123456",
 }
 

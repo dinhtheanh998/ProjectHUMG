@@ -1,6 +1,9 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
+export const NOTPERMISSION = "Bạn không có quyền làm điều này";
+export const DELETESUCCESS = "Xóa thành công";
+
 export function nFormatter(num, digits) {
   const lookup = [
     { value: 1, symbol: "" },

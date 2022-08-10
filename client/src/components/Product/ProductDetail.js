@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -5,6 +6,7 @@ import {
   getAProduct,
   getColorsProduct,
   getSizesProduct,
+  notifyWarn,
 } from "../../config/config";
 import { useCart } from "../../context/Cartcontext";
 
@@ -34,8 +36,6 @@ const ProductDetail = () => {
       setInfoColor(data);
     });
   }, [sanphamid]);
-
-  console.log(infoProduct,sanphamid);
   useEffect(() => {
     setDataProduct({...dataProduct, quantity: quantity})
     // console.log({...dataProduct, quantity: quantity});
@@ -51,8 +51,26 @@ const ProductDetail = () => {
     // setQuantity(e.target.value)
     // setDataProduct({...dataProduct, quantity: quantity});
   }
+  const handleAddToCart = async (dataProduct, indexSize, indexColor) => {
+    if (indexSize === null || indexColor === null) { 
+      console.log("indexSize", indexSize);
+      
+    } else {
+      // console.log(dataProduct.color.slice(1));      
+      const info = await axios.get(`/api/productsInfo/checkProductQuantity/id=${dataProduct._id}&color=${dataProduct.color.slice(1)}&size=${dataProduct.size}`)
+
+      if (info.data.length === 0) {
+        notifyWarn("Sản phẩm đã hết hàng")
+      }
+
+      if (info.data.length > 0 || info.data[0].quantity > 0) {
+        console.log("Có thể thêm vào giỏ");
+        addToCartFromDetail(dataProduct, indexSize, indexColor);
+      }
+    }
+  }
   return (
-    <div className="">
+    <div className="page-container">
       {infoProduct && (
         <div className="grid grid-cols-5 product-detail gap-x-10">
           <div className="col-start-1 col-end-4 rounded-xl product-detail-img">
@@ -216,8 +234,9 @@ const ProductDetail = () => {
                   onClick={
                     () => {
                       // Ấn đặt hàng
-                      console.log(dataProduct)
-                      addToCartFromDetail(dataProduct, indexSize, indexColor)
+                      handleAddToCart(dataProduct, indexSize, indexColor)
+                      // console.log(dataProduct)
+                      // addToCartFromDetail(dataProduct, indexSize, indexColor)
                     }
                   }
                 >

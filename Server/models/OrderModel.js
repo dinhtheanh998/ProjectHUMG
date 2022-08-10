@@ -24,6 +24,10 @@ const orDerSchema = new Schema({
         type: Number,
         requried: true,
     },
+    paymentMethods: {
+        type: String,
+        requried: true
+    },
     state: {
         type: String,
         requried: true,
@@ -37,6 +41,7 @@ const orDerSchema = new Schema({
         type: Date,
         default: new Date(),
     }
-})
+}
+, { timestamps: true })
 
 module.exports = mongoose.model("Order", orDerSchema);

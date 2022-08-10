@@ -1,20 +1,15 @@
+import { ThemeProvider } from "@material-tailwind/react";
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { PersistGate } from 'redux-persist/integration/react';
 import App from "./App";
-import Cart from "./components/Cart/Cart";
-import Login from "./components/Login-Logout/Login";
-import Base from "./components/pageBase/Base";
 import { CartProvider } from "./context/Cartcontext";
 import "./index.scss";
+import { persistor, store } from "./redux/store";
 import reportWebVitals from "./reportWebVitals";
-import { Provider } from "react-redux";
-import  { store,persistor } from "./redux/store";
-import Request from "./components/requestClient/Request";
-import ReturnRequest from "./components/requestClient/ReturnRequest";
-import { ThemeProvider } from "@material-tailwind/react";
-import { PersistGate } from 'redux-persist/integration/react'
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 

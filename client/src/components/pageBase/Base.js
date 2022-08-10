@@ -7,7 +7,7 @@ const Base = ({ children }) => {
   return (
     <div className="relative">
       <Header></Header>
-      <div className="my-10 page-container">{<Outlet></Outlet>}</div>
+      <div className="my-10 ">{<Outlet></Outlet>}</div>
       <Footer></Footer>
     </div>
   );
@@ -79,6 +79,7 @@ const Header = () => {
             </NavLink>
           </li>
         </ul>
+        
         <div className="cart">
           <NavLink to="/Cart" className="relative inline-block">
             <span className="w-[30px]">

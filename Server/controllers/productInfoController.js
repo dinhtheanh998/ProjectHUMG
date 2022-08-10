@@ -37,7 +37,6 @@ exports.get_a_proInfo = (req, res) => {
   );
 };
 
-
 exports.infoAggregate = (req, res) => {
   // console.log(req.params.productID);
   productInfo.aggregate(
@@ -64,6 +63,38 @@ exports.infoAggregate = (req, res) => {
       {
         $unwind: "$productInfo",
       },
+    ],
+
+    (err, proInfo) => {
+      if (err) res.send(err);
+      res.json(proInfo);
+    }
+  );
+};
+
+exports.getTotalQuantity = (req, res) => {
+  // console.log(req.params.productID);
+  productInfo.aggregate(
+    [
+      {
+        $lookup: {
+          from: "product",
+          localField: "productID",
+          foreignField: "_id",
+          as: "productInfo",
+        },
+      },
+      {
+        $unwind: "$productInfo",
+      },
+      {
+        $group: {
+          _id: null,
+          total: {
+            $sum: "$quantity",
+          },
+        },
+      },     
     ],
 
     (err, proInfo) => {
@@ -136,3 +167,18 @@ exports.UpdateQuantity = (req, res) => {
     }
   );
 };
+
+exports.checkProductQuantity = (req, res) => { 
+  productInfo.aggregate([
+    {
+      $match: {
+        productID: new mongoose.Types.ObjectId(req.params.infoId),
+        size: req.params.size,
+        color: `#${req.params.color}`,
+      }
+    }
+  ], (err, proInfo) => { 
+    if (err) res.send(err);
+    res.json(proInfo);
+  })
+}

@@ -14,6 +14,7 @@ router.get(
 router.post("/", productInfoBuilder.create_a_proInfo);
 
 router.get("/moreInfo", productInfoBuilder.infoAggregate);
+router.get("/getTotalQuantity", productInfoBuilder.getTotalQuantity);
 
 router.get(
   "/moreInfoOneProduct/:infoId",
@@ -30,4 +31,9 @@ router.put(
   "/updateQuantity/?id=:infoId&?color=:color&?size=:size&?quantity=:quantity",
   productInfoBuilder.UpdateQuantity
 )
+// 
+router.get("/checkProductQuantity/?id=:infoId&?color=:color&?size=:size", productInfoBuilder.checkProductQuantity);
+
+
+
 module.exports = router;

@@ -1,18 +1,51 @@
 import React, { useEffect, useRef, useState } from "react";
 import BottomBodyAdm from "../BottomBodyAdm";
+import ReactDOM from "react-dom";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { converCurences, getAllProduct } from "../../../config/config";
+import { v4 as uuidv4 } from "uuid";
 
 const ProductAdmin = () => {
   const navigate = useNavigate();
   const [dataPro, setdataPro] = useState();
   const [showOption, setShowOption] = useState(null);
+  const [popup, setPopup] = useState({
+    show: false, // initial values set to false and null
+    id: null,
+  });
+
+  const handleDelete = (id) => {
+    setPopup({
+      show: true,
+      id,
+    });
+  };
+
+  const handleDeleteTrue = () => {
+    if (popup.show && popup.id) {
+      axios.delete(`/api/products/${popup.id}`).then((res) => { 
+        console.log(res.data);
+      });
+      setPopup({
+        show: false,
+        id: null,
+      });
+    }
+  };
+
+  const handleDeleteFalse = () => {
+    setPopup({
+      show: false,
+      id: null,
+    });
+  };
+
   useEffect(() => {
     getAllProduct().then((data) => {
       setdataPro(data);
     });
-  }, []);
+  }, [popup]);
 
   const handleClickOptions = (e, index) => {
     if (showOption === index) setShowOption(null);
@@ -21,7 +54,7 @@ const ProductAdmin = () => {
   document.addEventListener("click", function (e) {
     setShowOption(null);
   });
-
+  
   return (
     <>
       <BottomBodyAdm>
@@ -46,7 +79,7 @@ const ProductAdmin = () => {
               return (
                 <div
                   className="grid items-center grid-cols-10 p-3 mb-2 bg-white rounded-xl"
-                  key={item._id}
+                  key={uuidv4()}
                 >
                   <div className="flex items-center col-start-1 col-end-4 mr-4 gap-x-3">
                     <div className="w-[100px] h-[100px] rounded-lg">
@@ -83,8 +116,9 @@ const ProductAdmin = () => {
                       type="button"
                       className="py-2 px-4 bg-[#f7f7f7] border  border-gray-50 rounded-lg font-semibold hover:bg-blue-400 hover:text-white transition-all"
                       onClick={() => {
-                      navigate(`/admin/edit-product/${item._id}`);
-                    }}>
+                        navigate(`/admin/edit-product/${item._id}`);
+                      }}
+                    >
                       Sửa
                     </button>
                   </div>
@@ -121,13 +155,19 @@ const ProductAdmin = () => {
                             : "opacity-0 scale-0 "
                         }`}
                         onClick={() => {
-                          console.log("click Delete", item._id);
+                          handleDelete(item._id);
                         }}
                       >
                         Xóa
                       </div>
                     </div>
                   </div>
+                  {popup.show && (
+                    <Popup
+                      handleDeleteTrue={handleDeleteTrue}
+                      handleDeleteFalse={handleDeleteFalse}
+                    ></Popup>
+                  )}
                 </div>
               );
             })}
@@ -136,5 +176,48 @@ const ProductAdmin = () => {
     </>
   );
 };
+
+function Popup({ handleDeleteTrue, handleDeleteFalse }) {
+  //popup xóa sản phẩm
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-5 rounded-lg modal">
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-black opacity-20 p-5  modal `}
+      ></div>
+      <div className="absolute z-[99999] flex flex-col items-center mx-auto gap-y-5 justify-center bg-white p-10 rounded-lg">
+        <span className="flex items-center text-xl font-semibold gap-x-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-6 h-6"
+            viewBox="0 0 20 20"
+            fill="#FFEA11"
+          >
+            <path
+              fillRule="evenodd"
+              d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <span>Bạn có chắc muốn xóa</span>
+        </span>
+        <div className="flex justify-between gap-x-5">
+          <button
+            className="px-4 py-2 font-semibold text-white bg-blue-400 rounded-lg"
+            onClick={handleDeleteTrue}
+          >
+            Có
+          </button>
+          <button
+            className="px-4 py-2 font-semibold text-white bg-red-400 rounded-lg"
+            onClick={handleDeleteFalse}
+          >
+            Không
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.querySelector("body")
+  );
+}
 
 export default ProductAdmin;
