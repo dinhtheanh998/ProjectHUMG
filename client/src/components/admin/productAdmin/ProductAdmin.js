@@ -3,17 +3,25 @@ import BottomBodyAdm from "../BottomBodyAdm";
 import ReactDOM from "react-dom";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { converCurences, getAllProduct } from "../../../config/config";
+import {
+  converCurences,
+  getAllProduct,
+  getPriceByTime,
+} from "../../../config/config";
 import { v4 as uuidv4 } from "uuid";
+import ChartPriceByTime from "./ChartPriceByTime";
+import { data } from "../HomeAdmin/ChartData";
 
 const ProductAdmin = () => {
   const navigate = useNavigate();
   const [dataPro, setdataPro] = useState();
   const [showOption, setShowOption] = useState(null);
+  const [priceByTime, setPriceByTime] = useState();
   const [popup, setPopup] = useState({
     show: false, // initial values set to false and null
     id: null,
   });
+  const [showChart, SetShowChart] = useState(false);
 
   const handleDelete = (id) => {
     setPopup({
@@ -24,7 +32,7 @@ const ProductAdmin = () => {
 
   const handleDeleteTrue = () => {
     if (popup.show && popup.id) {
-      axios.delete(`/api/products/${popup.id}`).then((res) => { 
+      axios.delete(`/api/products/${popup.id}`).then((res) => {
         console.log(res.data);
       });
       setPopup({
@@ -47,6 +55,14 @@ const ProductAdmin = () => {
     });
   }, [popup]);
 
+  const handleGetPriceByTime = (id) => {
+    SetShowChart(true);
+    getPriceByTime(id).then((data) => {
+      setPriceByTime(data[0]?.price?.flat());
+    });
+  };
+  console.log(priceByTime);
+
   const handleClickOptions = (e, index) => {
     if (showOption === index) setShowOption(null);
     else setShowOption(index);
@@ -54,7 +70,7 @@ const ProductAdmin = () => {
   document.addEventListener("click", function (e) {
     setShowOption(null);
   });
-  
+
   return (
     <>
       <BottomBodyAdm>
@@ -122,6 +138,7 @@ const ProductAdmin = () => {
                       Sửa
                     </button>
                   </div>
+
                   <div className="col-start-10 col-end-11 mr-4 ">
                     <div
                       className={`inline-block px-2 py-1  rounded-lg cursor-pointer pro-option select-none relative ${
@@ -149,16 +166,31 @@ const ProductAdmin = () => {
                         />
                       </svg>
                       <div
-                        className={`absolute right-0 px-3 py-1 bg-[#f8f8f9] cursor-pointer top-full option-pro-delete rounded-md transition-all origin-top-right border border-gray-50 font-semibold hover:opacity-70 ${
+                        className={`absolute right-0  font-semibold transition-all origin-top-right  rounded-md cursor-pointer top-full option-pro-delete ${
                           showOption === index
-                            ? "opacity-100 scale-100 bg-red-300 text-white"
+                            ? "opacity-100 scale-100"
                             : "opacity-0 scale-0 "
                         }`}
-                        onClick={() => {
-                          handleDelete(item._id);
-                        }}
                       >
-                        Xóa
+                        <div>
+                          <button
+                            type="button"
+                            className="px-4 py-2 font-semibold transition-all bg-blue-400 border rounded-lg border-gray-50 hover:bg-blue-800 hover:text-white"
+                            onClick={() => {
+                              handleGetPriceByTime(item._id);
+                            }}
+                          >
+                            Xem
+                          </button>
+                        </div>
+                        <div
+                          className={`px-4 py-2 font-semibold transition-all bg-red-400 border rounded-lg border-gray-50 hover:bg-red-800 hover:text-white`}
+                          onClick={() => {
+                            handleDelete(item._id);
+                          }}
+                        >
+                          Xóa
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -172,6 +204,17 @@ const ProductAdmin = () => {
               );
             })}
         </div>
+        {priceByTime && showChart && (
+          <ChartShow
+            data={data(
+              priceByTime,
+              priceByTime.map((item) => "")
+            )}
+            SetShowChart={SetShowChart}
+            setPriceByTime={setPriceByTime}
+          ></ChartShow>
+        )}
+        {!priceByTime && showChart &&<p>Sản phẩm này chưa bán được đâu azai</p>}
       </BottomBodyAdm>
     </>
   );
@@ -220,4 +263,24 @@ function Popup({ handleDeleteTrue, handleDeleteFalse }) {
   );
 }
 
+function ChartShow({ data, SetShowChart,setPriceByTime }) {
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-5 rounded-lg modal">
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-black opacity-20 p-5  modal `}
+        onClick={() => { 
+          SetShowChart(null)
+          setPriceByTime(undefined)
+        }}
+      
+      ></div>
+      <div className="absolute z-[99999] flex flex-col items-center mx-auto gap-y-5 justify-center bg-white p-10 rounded-lg w-[700px]">
+        <ChartPriceByTime data={data}></ChartPriceByTime>
+      </div>
+    </div>,
+    document.querySelector("body")
+  );
+}
+
 export default ProductAdmin;
+ 

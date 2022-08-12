@@ -52,6 +52,13 @@ export const getColorsProduct = (proId) => {
       return res.data;
     });
 };
+
+export const getPriceByTime = (proId) => {
+  return axios.get(`/api/order/test/testQuery/${proId}`).then((res) => { 
+    return res.data
+  })
+}
+
 export const notifySuccess = (message) =>
   toast.success(message, {
     position: "top-right",

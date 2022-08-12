@@ -55,7 +55,6 @@ export const data = (xData, labels) => {
         borderColor: '#66BFBF',        
         yAxisID: 'y',
         fill:true,
-        tension:0.5,
       },
     ],
   };

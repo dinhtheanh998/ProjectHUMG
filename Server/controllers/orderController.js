@@ -222,36 +222,50 @@ exports.getOrderByState = (req, res) => {
   );
 };
 
-exports.testQuery = (req, res) => {
+exports.getPriceByTime = (req, res) => {
+  console.log(req.params);
   order.aggregate(
     [
       {
-        $match: {
-          state: "Thành công",          
-        },
-      },      
-      {
-        $group: {
+        $project: {
           _id: "$details._id",
-          fullName: { $first: "$details.name" },
-          unitPromotionalPrice: { $push: "$details.unitPromotionalPrice" },
-          // name:{$push :"$fullName"},
-          // quantity: { $push: "$details.quantity" },
+          name: "$details.name",
+          price: "$details.unitPromotionalPrice",
+          state: "$state",
+          updatedAt: "$updatedAt"     
         },
       },
       {
         $unwind: "$_id",
       },
       {
-        $unwind: "$fullName",
+        $unwind: "$name",
       },
       
-      // {
-      //   $match: {
-      //     _id: mongoose.Types.ObjectId("62ee79d32670e798111e62b1"),
-      //   }
-      // }
+      {
+        $match: {
+          state: "Thành công",
+          _id: req.params.id,
+        },
+      },   
       
+      {
+        $group: {
+          // _id: { day: { "$dayOfMonth": "$updatedAt" }, "month": { $month: "$updatedAt" } },
+          // "_id":{"year":{"$year":"$updatedAt"}} ,
+          _id: "$_id",
+          "transactions":{"$push":"$$ROOT"},
+          // unitPromotionalPrice: { $addToSet: "$price" },
+        },
+      },
+      { $sort: { "day": -1, "month": -1 } },
+      {
+        $project: {
+          price: "$transactions.price" ,
+        }
+      }
+      
+      // {"$sort":{"$updatedAt":1}},
       
     ],
     (err, order) => {

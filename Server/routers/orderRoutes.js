@@ -12,5 +12,5 @@ router.get('/getProfitNowMonth', orderBuilder.getProfitOrderNowMonth)
 router.get('/getProfitPermonth', orderBuilder.getProfitPerMonth)
 router.get('/getProfitMonthly', orderBuilder.getProfitMonthly)
 router.get('/getOrderByState/?state=:state', orderBuilder.getOrderByState)
-router.get('/test/testQuery', orderBuilder.testQuery)
+router.get('/test/testQuery/:id', orderBuilder.getPriceByTime)
 module.exports = router
