@@ -36,9 +36,9 @@ POST http://localhost:3001/api/auth/register HTTP/1.1
 content-type: application/json
 
 {
-    "email": "themme@gmail.com",
+    "email": "themmde@gmail.com",
     "password": "123456",
-    "username": "theme"
+    "username": "duclam"
 }
 
 ### Post Base
@@ -46,9 +46,23 @@ POST http://localhost:3001/api/auth/login HTTP/1.1
 content-Type: application/json
 
 {   
-    "username": "abc98123",
+    "username": "dinhtheanh",
     "password": "123456",
 }
+
+### Post Base
+POST http://localhost:3001/api/auth/login HTTP/1.1
+content-Type: application/json
+
+{   
+    "username": "dinhtheanh",
+    "password": "123456",
+}
+
+
+### 
+POST http://localhost:3001/v1/auth/refresh HTTP/1.1 
+
 
 ###
 
