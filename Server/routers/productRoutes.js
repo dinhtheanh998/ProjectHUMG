@@ -6,6 +6,7 @@ const router = express.Router();
 router.get("/", productBuilder.list_all_products);
 router.get("/getAllProduct", productBuilder.getAllProduct);
 router.get("/getProductByQuery/?query=:query", productBuilder.findProductByQuery);
+// router.get("/getProductByQuery", productBuilder.findProductByQuery);
 router.post("/", productBuilder.uploadImage, productBuilder.create_a_product);
 // router.post("/", productBuilder.create_a_task);
 router.get("/:productId", productBuilder.getAProduct);

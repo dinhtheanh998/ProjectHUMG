@@ -13,8 +13,8 @@ function routes(app) {
   app.use("/api/products", productsRoutes);
   app.use("/api/productsInfo", productInfoRoutes);
   app.use("/api/order", orderRoutes);
-  app.use ("/api/user",userRoutes)
-  app.use("/api/auth", authRoutes);
+  app.use ("/v1/user",userRoutes)
+  app.use("/v1/auth", authRoutes);
   app.use("/api/returnRequest", returnRequest);
   app.use("/api/exchangeRequest", exchangeRequest);
 }

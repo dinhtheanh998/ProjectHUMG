@@ -23,18 +23,38 @@ const Product = ({
   });
 
   const { addToCart } = useCart();
-  useLayoutEffect(() => {
+  useEffect(() => {
     setLoading(true);
+    let unmounted = false;
+    let source = axios.CancelToken.source();
     axios
       .get(`/api/productsInfo/product=${data._id}&distinct=color`)
       .then((res) => {
-        setInfoColor(res.data);
-        setLoading(false);
-      });
+        if (!unmounted) {
+          setInfoColor(res.data);
+          setLoading(false);
+        }
+      }).catch((err) => { 
+        if(!unmounted){
+          setLoading(false);
+        }
+        if(axios.isCancel(err)){
+          console.log("request canceled:"+ err.message);
+        } else {
+          console.log("another error:" + err.message);
+        }
+      })
+      ;
+    return () => {
+      unmounted = true;
+      source.cancel("cancel request");
+    }
   }, [data._id]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     setLoading(true);
+    let unmounted = false;
+    let source = axios.CancelToken.source();
     axios
       .get(
         `/api/productsInfo/getSizeFromColor/id=${data._id}&color=${color?.slice(
@@ -42,9 +62,25 @@ const Product = ({
         )}`
       )
       .then((res) => {
-        setInfoSize2(res?.data[0]?.size);
-        setLoading(false);
+        if (!unmounted) {
+          setInfoSize2(res?.data[0]?.size);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!unmounted) {
+          setLoading(false);
+          if (axios.isCancel(err)) {
+            console.log("Request canceled", err);
+          } else {
+            console.log("another error", err);
+          }
+        }
       });
+    return () => {
+      unmounted = true;
+      source.cancel("Cancelling in cleanup");
+    };
   }, [color, data._id]);
   const handleGetInfo = (e) => {
     if (e.target.closest(".product-color")) {

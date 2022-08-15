@@ -168,6 +168,13 @@ exports.UpdateQuantity = (req, res) => {
   );
 };
 
+exports.updateProductInfo = (req, res) => {
+  productInfo.findByIdAndUpdate(req.params.infoId, req.body, { new: true }, (err, proInfo) => {
+    if (err) res.send(err);
+    res.json(proInfo);
+  })
+};
+
 exports.checkProductQuantity = (req, res) => { 
   productInfo.aggregate([
     {
@@ -178,6 +185,13 @@ exports.checkProductQuantity = (req, res) => {
       }
     }
   ], (err, proInfo) => { 
+    if (err) res.send(err);
+    res.json(proInfo);
+  })
+}
+
+exports.getInfobyId = (req, res) => { 
+  productInfo.find({ _id: req.params.infoId }, (err, proInfo) => { 
     if (err) res.send(err);
     res.json(proInfo);
   })

@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 
 export const NOTPERMISSION = "Bạn không có quyền làm điều này";
 export const DELETESUCCESS = "Xóa thành công";
+const TIMEZONE = "+07:00"
 
 export function nFormatter(num, digits) {
   const lookup = [
@@ -80,3 +81,8 @@ export const notifySuccess = (message) =>
     draggable: true,
     progress: undefined,
   });
+
+  export const convertDate = (date) => {
+    let newDate = new Date(date);
+    return newDate.toLocaleString('vi');
+  }

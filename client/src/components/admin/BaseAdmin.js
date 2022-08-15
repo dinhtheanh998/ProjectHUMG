@@ -3,21 +3,26 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import HomeAdmin from "./HomeAdmin/HomeAdmin";
 import { useSelector, useDispatch } from "react-redux";
 import { logOut } from "../../redux/apiRequest";
+import { logOutSuccess } from "../../redux/authSlice";
+import { createAxios } from "../../createInstance";
 const BaseAdmin = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.login.currentUser);
+  const accessToken = user?.accessToken;
+  const id = user?.id;
   const dispatch = useDispatch();
+  let axiosJWT = createAxios(user,dispatch,logOutSuccess);
   useEffect(() => {
-    if (!user) {
+    if (!user?.isAdmin) {
       navigate("/");
     }
   }, []);
   const handleLogout = () => {
-    logOut(dispatch, navigate);
+    logOut(dispatch, id , navigate , accessToken ,axiosJWT);
   };
   return (
     <div className="page-container">
-      <div className="grid w-full h-screen grid-cols-10 shadow-xl">
+      <div className="grid w-full grid-cols-10 h-[100vh] shadow-xl">
         <div className="h-full col-start-1 col-end-3 bg-black rounded-lg">
           <div className="h-[200px] text-center">
             <img

@@ -23,8 +23,10 @@ const DropDownCustom = ({ control, setValue, name, data, dropDownLabel, defaultL
   
   useEffect(() => { 
     setValue(name,defaultLabelId)
-  },[])
+  }, [])
+  
 
+  
   return (
     <div className="relative" ref={showRef}>
       <div

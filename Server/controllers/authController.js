@@ -1,4 +1,4 @@
-const User = require("../models/UserModel");
+const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
@@ -6,33 +6,36 @@ const jwt = require("jsonwebtoken");
 let refreshTokens = [];
 
 const authController = {
-  // Register
+  //REGISTER
   registerUser: async (req, res) => {
     try {
       const salt = await bcrypt.genSalt(10);
-      const heshPassword = await bcrypt.hash(req.body.password, salt);
-      //   create new user
-      const newUser = new User({
+      const hashed = await bcrypt.hash(req.body.password, salt);
+
+      //Create new user
+      const newUser = await new User({
         username: req.body.username,
         email: req.body.email,
-        password: heshPassword,
+        password: hashed,
       });
-      //  save user to database
+
+      //Save user to DB
       const user = await newUser.save();
       res.status(200).json(user);
-    } catch (error) {
-      res.status(500).json(error);
+    } catch (err) {
+      res.status(500).json(err);
     }
+    
   },
+
   generateAccessToken: (user) => {
     return jwt.sign(
       {
         id: user.id,
         isAdmin: user.isAdmin,
       },
-      process.env.JWT_SECRET,
-      // "secret",
-      { expiresIn: "30s" }
+      process.env.JWT_ACCESS_KEY,
+      { expiresIn: "20s" }
     );
   },
 
@@ -43,7 +46,6 @@ const authController = {
         isAdmin: user.isAdmin,
       },
       process.env.JWT_REFRESH_KEY,
-      // "dinhtheanh",
       { expiresIn: "365d" }
     );
   },
@@ -52,6 +54,8 @@ const authController = {
   loginUser: async (req, res) => {
     try {
       const user = await User.findOne({ username: req.body.username });
+      // console.log(user);
+
       if (!user) {
         return res.status(404).json("Tài khoản không chính xác");
       }
@@ -67,13 +71,13 @@ const authController = {
         const accessToken = authController.generateAccessToken(user);
         //Generate refresh token
         const refreshToken = authController.generateRefreshToken(user);
-        refreshTokens.push(refreshToken);
-        // STORE REFRESH TOKEN IN COOKIE
+        //STORE REFRESH TOKEN IN COOKIE
         res.cookie("refreshToken", refreshToken, {
           httpOnly: true,
-          secure: false,
+          secure:false,
           path: "/",
           sameSite: "strict",
+          maxAge: 1000 * 60 * 60 * 24 * 365,
         });
         const { password, ...others } = user._doc;
         return res.status(200).json({ ...others, accessToken, refreshToken });
@@ -81,11 +85,13 @@ const authController = {
     } catch (err) {
       return res.status(500).json(err);
     }
+    
   },
 
   requestRefreshToken: async (req, res) => {
     //Take refresh token from user
     const refreshToken = req.cookies.refreshToken;
+    console.log("refreshToken",refreshToken);
     //Send error if token is not valid
     if (!refreshToken) return res.status(401).json("You're not authenticated");
     jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY, (err, user) => {
@@ -102,6 +108,7 @@ const authController = {
         secure:false,
         path: "/",
         sameSite: "strict",
+        maxAge: 1000 * 60 * 60 * 24 * 365,
       });
       res.status(200).json({
         accessToken: newAccessToken,
@@ -113,9 +120,9 @@ const authController = {
   //LOG OUT
   logOut: async (req, res) => {
     //Clear cookies when user logs out
-    refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
     res.clearCookie("refreshToken");
     res.status(200).json("Logged out successfully!");
   },
 };
+
 module.exports = authController;

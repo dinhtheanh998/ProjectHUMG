@@ -51,7 +51,9 @@ const ViewProductDetails = () => {
                 {item.quantity}
               </span>
               <div className="col-start-9 col-end-10 mr-4">
-                <button type="button" className="">
+                <button type="button" className="" onClick={() => {
+                  navigate(`/admin/EditInfoProduct/${item._id}`)
+                }}>
                   Sửa
                 </button>
               </div>

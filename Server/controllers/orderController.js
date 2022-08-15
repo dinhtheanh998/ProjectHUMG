@@ -61,7 +61,7 @@ exports.getOrderByCondition = (req, res) => {
     [
       {
         $match: {
-          $or: [{ _id: req.params.query }, { phone: req.params.query }],
+          $or: [{ _id: { $regex:'.*'+req.params.query+'.*',$options:"$gi"} }, { phone: { $regex:'.*'+req.params.query+'.*',$options:"$gi"} }],
         },
       },
     ],
@@ -274,3 +274,19 @@ exports.getPriceByTime = (req, res) => {
     }
   );
 };
+
+exports.getOrderbyUser = (req, res) => { 
+  order.aggregate(
+    [
+      {
+        $match: {
+          userName: req.params.id,
+        },
+      },
+    ],
+    (err, order) => {
+      if (err) res.send(err);
+      res.json(order);
+    }
+  );
+}

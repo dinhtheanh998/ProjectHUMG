@@ -4,7 +4,7 @@ const {
   verifyToken,
   verifyTokenAndAdmin,
   //   verifyTokenAndUserAuthorization,
-} = require("../controllers/veryToken");
+} = require("../controllers/verifyToken");
 
 const multer = require("multer");
 

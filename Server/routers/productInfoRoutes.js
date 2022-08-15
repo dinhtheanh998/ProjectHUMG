@@ -34,6 +34,7 @@ router.put(
 // 
 router.get("/checkProductQuantity/?id=:infoId&?color=:color&?size=:size", productInfoBuilder.checkProductQuantity);
 
-
+router.put("/update/:infoId", productInfoBuilder.updateProductInfo);
+router.get("/getInfoById/:infoId",productInfoBuilder.getInfobyId);
 
 module.exports = router;

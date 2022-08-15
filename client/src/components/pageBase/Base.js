@@ -1,65 +1,146 @@
-import React, { useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/Cartcontext";
+import { createAxios } from "../../createInstance";
+import { logOut } from "../../redux/apiRequest";
+import { logOutSuccess } from "../../redux/authSlice";
 import Login from "../Login-Logout/Login";
+import Register from "../Login-Logout/Register";
 
 const Base = ({ children }) => {
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.login.currentUser);
+  const accessToken = user?.accessToken;
+  const id = user?._id;
+  const dispatch = useDispatch();
+  let axiosJWT = createAxios(user, dispatch, logOutSuccess);
+  
+  const handleLogout = () => {
+    logOut(dispatch, id, navigate, accessToken, axiosJWT);
+  };
+
   return (
     <div className="relative">
-      <Header></Header>
+      <Header user={user} handleLogout={handleLogout}></Header>
       <div className="my-10 ">{<Outlet></Outlet>}</div>
       <Footer></Footer>
     </div>
   );
 };
 
-const Header = () => {
+const Header = ({ user, handleLogout }) => {
   const { cartItems, calcQuantity } = useCart();
   const [loginShow, setLoginShow] = useState(false);
+  const [registerShow, setRegisterShow] = useState(false);
   // const countCartItems = cartItems.reduce((acc, item) => {
   //   return acc + item.quantity;
   // }, 0);
   // console.log(countCartItems);
+  useEffect(() => { 
+    const handleScroll = () => { 
+      if (window.scrollY > 40) {
+        document.querySelector(".header").classList.add("fixed");
+      } else {
+        document.querySelector(".header").classList.remove("fixed");
+      }
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => { 
+      window.removeEventListener("scroll", handleScroll)
+    }
+  },[])
   return (
     <>
-      <div className="w-full bg-black">
-        <div className="flex items-center justify-between w-full h-12 text-white top-header page-container ">
-          <a href="tel:0961494001">0961494001</a>
-          <div className="flex items-center cursor-pointer gap-x-5">
-            <span
-              onClick={() => {
-                setLoginShow(true);
-              }}
-              className="flex items-center gap-x-2"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5 font-normal"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
+      <div className="top-0 left-0 right-0 z-30 w-full transition-all bg-black header">
+        <div className="flex items-center justify-between w-full text-white h-14 top-header page-container">
+          <a href="tel:0961494001" className="select-none">0961494001</a>
+          <div className="flex items-center select-none gap-x-5">
+            {user && (
+              <div className="flex items-center gap-x-5">
+                <NavLink to="manager-user/profile-user" className="w-8 h-8 border-4 border-white rounded-full cursor-pointer rouned-full">
+                  <img src={`${user.avatar ? `/avatarUser/${user.avatar}` :"/avatarUser/defaultAvatar.jpg"}`} alt=""  className="object-cover w-full h-full p-0 m-0 rounded-full"/>
+                </NavLink>
+              <span
+                onClick={handleLogout}
+                className="flex items-center cursor-pointer gap-x-2 "
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span className="font-semibold">Đăng nhập</span>
-            </span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className="font-semibold">Đăng xuất</span>
+                </span>
+                </div>
+            )}
+            {!user && (
+              <div className="flex items-center gap-x-3">
+                <span
+                  onClick={() => {
+                    setLoginShow(true);
+                  }}
+                  className="flex items-center gap-x-2"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                  <span className="font-semibold">Đăng nhập</span>
+                </span>
+                <span
+                  onClick={() => {
+                    setRegisterShow(true);
+                  }}
+                  className="flex items-center gap-x-2"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                    />
+                  </svg>
+                  <span className="font-semibold">Đăng ký</span>
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>
       <nav className="flex items-center justify-between  my-5 shadow-sm menu page-container h-[70px]">
-        <div className="h-full">
+        <div className="h-full select-none">
           <img
             src="https://www.logodesign.net/logo/line-art-house-roof-and-buildings-4485ld.png"
             alt=""
             className="w-full h-full"
           />
         </div>
-        <ul className="nav-list">
+        <ul className="select-none nav-list">
           <li className="nav-items">
             <NavLink
               to="/"
@@ -79,7 +160,7 @@ const Header = () => {
             </NavLink>
           </li>
         </ul>
-        
+
         <div className="cart">
           <NavLink to="/Cart" className="relative inline-block">
             <span className="w-[30px]">
@@ -98,15 +179,18 @@ const Header = () => {
                 />
               </svg>
             </span>
-            <span className="absolute top-0 right-0 w-5 h-5 font-semibold leading-5 text-center text-white bg-pink-500 rounded-full translate-x-2/4">
+            <span className="absolute top-0 right-0 w-5 h-5 font-semibold leading-5 text-center text-white bg-pink-500 rounded-full select-none translate-x-2/4">
               {calcQuantity() || 0}
             </span>
           </NavLink>
         </div>
       </nav>
       {loginShow && (
-        <Login loginShow={loginShow} setLoginShow={setLoginShow}></Login>
+        <Login loginShow={loginShow} setLoginShow={setLoginShow} setRegisterShow={setRegisterShow}></Login>
       )}
+      {
+        registerShow && (<Register registerShow={registerShow} setRegisterShow={setRegisterShow} setLoginShow={setLoginShow}></Register>)
+      }
     </>
   );
 };

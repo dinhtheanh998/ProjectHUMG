@@ -83,6 +83,9 @@ const EditProduct = () => {
     });
   }, [productid]);
 
+
+  console.log(dataAProduct)
+
   useEffect(() => {
     axios.get("/api/category").then((res) => {
       setCateData(res.data);
@@ -104,12 +107,13 @@ const EditProduct = () => {
       formData.append("description", data.description);
       formData.append("categories", data.categories);
     }
-    axios.put(`/api/products/${productid}`, formData).then((res) => {
-      if (res.status === 200) notifySuccess("Sửa sản phẩm thành công");
-      // setTimeout(() => {
-      //   navigate("/admin/product-Admin");
-      // }, 1500);
-    });
+    console.log(data)
+    // axios.put(`/api/products/${productid}`, formData).then((res) => {
+    //   if (res.status === 200) notifySuccess("Sửa sản phẩm thành công");
+    //   // setTimeout(() => {
+    //   //   navigate("/admin/product-Admin");
+    //   // }, 1500);
+    // });
     for (const pair of formData.entries()) {
       console.log(`${pair[0]}, ${pair[1]}`);
     }
