@@ -45,7 +45,6 @@ exports.delete_a_cate = (req, res) => {
 };
 
 exports.getCateLimit = (req, res) => { 
-  console.log(req.params.limit);
   category.find({}).limit(req.params.limit).sort({_id: -1}).exec((err, categories) => {
     if (err) res.send(err);
     res.json(categories);

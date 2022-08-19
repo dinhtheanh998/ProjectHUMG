@@ -15,7 +15,7 @@ const Base = ({ children }) => {
   const id = user?._id;
   const dispatch = useDispatch();
   let axiosJWT = createAxios(user, dispatch, logOutSuccess);
-  
+
   const handleLogout = () => {
     logOut(dispatch, id, navigate, accessToken, axiosJWT);
   };
@@ -37,49 +37,62 @@ const Header = ({ user, handleLogout }) => {
   //   return acc + item.quantity;
   // }, 0);
   // console.log(countCartItems);
-  useEffect(() => { 
-    const handleScroll = () => { 
+  useEffect(() => {
+    const handleScroll = () => {
       if (window.scrollY > 40) {
         document.querySelector(".header").classList.add("fixed");
       } else {
         document.querySelector(".header").classList.remove("fixed");
       }
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => { 
-      window.removeEventListener("scroll", handleScroll)
-    }
-  },[])
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
   return (
     <>
       <div className="top-0 left-0 right-0 z-30 w-full transition-all bg-black header">
         <div className="flex items-center justify-between w-full text-white h-14 top-header page-container">
-          <a href="tel:0961494001" className="select-none">0961494001</a>
+          <a href="tel:0961494001" className="select-none">
+            0961494001
+          </a>
           <div className="flex items-center select-none gap-x-5">
             {user && (
               <div className="flex items-center gap-x-5">
-                <NavLink to="manager-user/profile-user" className="w-8 h-8 border-4 border-white rounded-full cursor-pointer rouned-full">
-                  <img src={`${user.avatar ? `/avatarUser/${user.avatar}` :"/avatarUser/defaultAvatar.jpg"}`} alt=""  className="object-cover w-full h-full p-0 m-0 rounded-full"/>
-                </NavLink>
-              <span
-                onClick={handleLogout}
-                className="flex items-center cursor-pointer gap-x-2 "
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-5 h-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
+                <NavLink
+                  to="manager-user/profile-user"
+                  className="w-8 h-8 border-4 border-white rounded-full cursor-pointer rouned-full"
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
-                    clipRule="evenodd"
+                  <img
+                    src={`${
+                      user.avatar
+                        ? `/avatarUser/${user.avatar}`
+                        : "/avatarUser/defaultAvatar.jpg"
+                    }`}
+                    alt=""
+                    className="object-cover w-full h-full p-0 m-0 rounded-full"
                   />
-                </svg>
-                <span className="font-semibold">Đăng xuất</span>
+                </NavLink>
+                <span
+                  onClick={handleLogout}
+                  className="flex items-center cursor-pointer gap-x-2 "
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span className="font-semibold">Đăng xuất</span>
                 </span>
-                </div>
+              </div>
             )}
             {!user && (
               <div className="flex items-center gap-x-3">
@@ -133,12 +146,21 @@ const Header = ({ user, handleLogout }) => {
         </div>
       </div>
       <nav className="flex items-center justify-between  my-5 shadow-sm menu page-container h-[70px]">
-        <div className="h-full select-none">
-          <img
-            src="https://www.logodesign.net/logo/line-art-house-roof-and-buildings-4485ld.png"
-            alt=""
-            className="w-full h-full"
-          />
+        <div className="flex items-center h-full cursor-pointer select-none">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-8 h-8"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+            />
+          </svg>
         </div>
         <ul className="select-none nav-list">
           <li className="nav-items">
@@ -186,11 +208,19 @@ const Header = ({ user, handleLogout }) => {
         </div>
       </nav>
       {loginShow && (
-        <Login loginShow={loginShow} setLoginShow={setLoginShow} setRegisterShow={setRegisterShow}></Login>
+        <Login
+          loginShow={loginShow}
+          setLoginShow={setLoginShow}
+          setRegisterShow={setRegisterShow}
+        ></Login>
       )}
-      {
-        registerShow && (<Register registerShow={registerShow} setRegisterShow={setRegisterShow} setLoginShow={setLoginShow}></Register>)
-      }
+      {registerShow && (
+        <Register
+          registerShow={registerShow}
+          setRegisterShow={setRegisterShow}
+          setLoginShow={setLoginShow}
+        ></Register>
+      )}
     </>
   );
 };

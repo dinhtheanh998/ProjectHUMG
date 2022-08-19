@@ -106,7 +106,7 @@ const Product = ({
 
   return (
     <div
-      className="relative p-2 overflow-hidden bg-white rounded-lg cursor-pointer product-wrap page-container"
+      className="relative w-full p-2 overflow-hidden bg-white rounded-lg cursor-pointer product-wrap page-container hover:shadow-lg group"
       onClick={(e) => {
         // navigate(`/san-pham/${data._id}`);
         handleClickProduct(e);
@@ -121,10 +121,9 @@ const Product = ({
               <img
                 src={`/images/${data.images}`}
                 alt=""
-                className="object-cover w-full h-full"
+                className="object-cover w-full h-full transition duration-500 ease-in-out group-hover:scale-110 group-hover:opacity-70"
               />
             </div>
-
             <div className="absolute bottom-0 flex flex-wrap items-center gap-2 px-3 py-3 text-white transition-all translate-y-full group-hover:visible group-hover:translate-y-0 pro-size">
               {infoSize2 &&
                 infoSize2.length > 0 &&

@@ -78,13 +78,13 @@ const ProductPage = () => {
               <span className="inline-block w-[15px] h-[15px] mr-2 border border-gray-400 rounded-full"></span>
               <span className="cursor-pointer">Tất cả</span>
             </label>
-            
           </div>
-        </div>
+        </div>       
       </div>
       <div className="col-start-5 col-end-13">
         <div className="grid grid-cols-4">
-          {!productsByPrice && products &&
+          {!productsByPrice &&
+            products &&
             products.length > 0 &&
             products.map((product) => {
               return (
