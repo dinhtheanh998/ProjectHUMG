@@ -51,10 +51,8 @@ const ManagerAccount = () => {
     } 
   };
 
-  useEffect(() => {
-    if (user?.accessToken) {
-      getAllUsers(user?.accessToken, dispatch, axiosJWT);
-    }
+  useEffect(() => {    
+      getAllUsers(user?.accessToken, dispatch, axiosJWT);    
   }, [reload]);
   return (
     <BottomBodyAdm>

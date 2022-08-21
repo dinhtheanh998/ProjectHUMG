@@ -40,6 +40,9 @@ const orDerSchema = new Schema({
     createdDate: {
         type: Date,
         default: new Date(),
+    },
+    userName: {
+        type: String,
     }
 }
 , { timestamps: true })

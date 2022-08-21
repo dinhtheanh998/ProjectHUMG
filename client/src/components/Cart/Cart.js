@@ -8,6 +8,7 @@ import { converCurences } from "../../config/config";
 import CartItems from "./CartItems";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useSelector } from "react-redux";
 
 const schema = yup.object().shape({
   fullName: yup.string().required("Họ vàn tên không được để trống"),
@@ -45,6 +46,7 @@ const Cart = () => {
   const [infoColor, setInfoColor] = useState();
   const [submitData, setSubmitData] = useState();
   const [reload, setReload] = useState(false);
+  const user = useSelector((state) => state.auth.login.currentUser);
   const {
     control,
     handleSubmit,
@@ -81,6 +83,21 @@ const Cart = () => {
     // eslint-disable-nextLine react-hooks/exhaustive-deps
   }, [reload]);
   const handleSubmitOrder = (data) => {
+    if (user && cartItems.length !== 0) {
+      data = {
+        ...data,
+        total: totalPrice(),
+        details: cartItems,
+        userName: user.username,
+      };
+      axios.post("/api/order", data).then((res) => {
+        if (res.status === 200) {
+          clearCart();
+        }
+        setSubmitData(res.data);
+      });
+      return;
+    }
     if (cartItems.length === 0) {
       setError("cart", { type: "custom", message: "Giỏ hàng đang trống" });
     } else {
@@ -96,7 +113,10 @@ const Cart = () => {
   return (
     <>
       {!submitData && (
-        <form className="page-container" onSubmit={handleSubmit(handleSubmitOrder)}>
+        <form
+          className="page-container"
+          onSubmit={handleSubmit(handleSubmitOrder)}
+        >
           <div className="grid grid-cols-2 gap-10">
             <div className="wrap-info-customer">
               <div className="grid w-full grid-cols-2 gap-x-5">

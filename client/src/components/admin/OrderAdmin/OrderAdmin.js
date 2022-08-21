@@ -82,7 +82,7 @@ const OrderAdmin = () => {
   
   return (
     <BottomBodyAdm>
-      <div className="p-4">
+      <div className=" z-[99] py-4 top-5 ">
         <div className="relative flex items-center ">
           <label htmlFor="simple-search" className="sr-only">
             Search
@@ -141,12 +141,13 @@ const OrderAdmin = () => {
           </div>
         </span>
       </div>
-
+      <div>
       {!searchData &&
         dataOrder &&
         dataOrder.length > 0 &&
         dataOrder.map((item, index) => {
           return (
+            <>
             <form
               onSubmit={handleSubmit(handleOnSubmit)}
               className="relative grid items-center grid-cols-10 p-3 mb-4 bg-white rounded-xl"
@@ -254,9 +255,13 @@ const OrderAdmin = () => {
                   );
                 })}
               </div>
-            </form>
+              </form>              
+            </>
+              
           );
         })}
+      </div>
+
       {searchData &&
         searchData.length > 0 &&
         searchData.map((item, index) => {

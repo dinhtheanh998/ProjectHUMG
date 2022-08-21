@@ -1,10 +1,15 @@
 import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
+import advdesign from "../../assets/adv_design.svg";
+import advtruck from "../../assets/adv_truck.svg";
+import advcert from "../../assets/adv_cert.svg";
+import advgeo from "../../assets/adv_geo.svg";
 import { Outlet } from "react-router-dom";
 import _debounce from "lodash/debounce";
 import { v4 as uuidv4 } from "uuid";
 import Product from "../Product/Product";
 import SlideHeaderHome from "../SlideHeaderHome";
+import CatelistIcon from "./Catelist";
 
 const Home = () => {
   const [products, setProducts] = useState();
@@ -16,11 +21,11 @@ const Home = () => {
       setProducts(response.data);
     });
   }, []);
-  useEffect(() => {
-    axios.get(`api/category/getlimitCate/limit=0`).then((response) => {
-      setCateData(response.data);
-    });
-  }, []);
+  // useEffect(() => {
+  //   axios.get(`api/category/getlimitCate/limit=0`).then((response) => {
+  //     setCateData(response.data);
+  //   });
+  // }, []);
 
   const fetchDataWithSearch = (key) => {
     axios.get(`/api/products/getProductByQuery/query=${key}`).then((res) => {
@@ -46,80 +51,13 @@ const Home = () => {
     // console.log(data);
     setSearchData(data.data);
   };
+
   return (
     <>
       {/* .slice(0, showCateLimit ? 1 : cateData.length) */}
       <div className="flex items-center justify-between mb-5 page-container">
        
-        <div
-          className={`flex items-center gap-x-6 wrap-catelist ${
-            showCateLimit ? "open" : ""
-          }`}
-        >
-          {cateData &&
-            cateData.map((cate) => (
-              <span
-                data-value={cate._id}
-                className="px-5 py-2 font-semibold border border-gray-300 rounded-lg cursor-pointer whitespace-nowrap"
-                onClick={handleSearchByCate}
-                key={uuidv4()}
-              >
-                {cate.name}
-              </span>
-            ))}
-        </div>
-        <div className="flex items-center mr-auto">
-          {!showCateLimit && (
-            <label
-              htmlFor="checkCate"
-              className="cursor-pointer"
-              onClick={() => {
-                setShowCateLimit(true);
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </label>
-          )}
-
-          {showCateLimit && (
-            <label
-              htmlFor="cateC"
-              className="cursor-pointer"
-              onClick={() => {
-                setShowCateLimit(false);
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </label>
-          )}
-        </div>
-
+        <CatelistIcon  handleSearchByCate={handleSearchByCate}></CatelistIcon> 
         <div className="text-center min-w-[400px] flex items-center">
           <span className="mr-3 font-semibold">Tìm kiếm:</span>
           <input
@@ -132,7 +70,44 @@ const Home = () => {
         </div>
       </div>
       {!searchData && <SlideHeaderHome></SlideHeaderHome>}
-
+      <div className="flex items-center justify-center my-5 page-container gap-x-10">
+        <div className="relative flex justify-center overflow-hidden cursor-pointer group">
+          <div className="wrap-img-cate w-[200px] h-[200px] rounded-lg">
+            <img
+              src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80"
+              alt=""
+              className="object-cover w-full h-full rounded-lg"
+            />
+          </div>
+          <span className="absolute px-6 py-2 w-[60%] top-full group-hover:-translate-y-[40px] bg-white text-black font-semibold uppercase transition-all text-center rounded-lg">
+            Men
+          </span>
+        </div>
+        <div className="relative flex justify-center overflow-hidden cursor-pointer group">
+          <div className="wrap-img-cate w-[200px] h-[200px] rounded-lg">
+            <img
+              src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80"
+              alt=""
+              className="object-cover w-full h-full rounded-lg"
+            />
+          </div>
+          <span className="absolute px-6 py-2 w-[60%] top-full group-hover:-translate-y-[40px] bg-white text-black font-semibold uppercase transition-all text-center rounded-lg">
+            Men
+          </span>
+        </div>
+        <div className="relative flex justify-center overflow-hidden cursor-pointer group">
+          <div className="wrap-img-cate w-[200px] h-[200px] rounded-lg">
+            <img
+              src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80"
+              alt=""
+              className="object-cover w-full h-full rounded-lg"
+            />
+          </div>
+          <span className="absolute px-6 py-2 w-[60%] top-full group-hover:-translate-y-[40px] bg-white text-black font-semibold uppercase transition-all text-center rounded-lg">
+            Men
+          </span>
+        </div>
+      </div>
       <div className="grid grid-cols-4 gap-x-6 page-container">
         {!searchData &&
           products &&
@@ -145,6 +120,33 @@ const Home = () => {
           searchData.map((item, index) => {
             return <Product data={item} key={uuidv4()}></Product>;
           })}
+      </div>
+     {/* adv */}
+      <div className="flex items-center justify-between my-[100px] page-container gap-x-10">  
+        <div className="flex flex-col justify-center">
+          <div className="advan__item w-[150px]">
+            <img src={advdesign} alt="" className="h-[150px]" />
+          </div>
+          <span className="text-lg font-semibold">Thiết kế đa dạng</span>
+        </div>
+        <div className="flex flex-col justify-center">
+          <div className="advan__item w-[150px]">
+            <img src={advtruck} alt="" className="h-[150px]" />
+          </div>
+          <span className="text-lg font-semibold">Giao hàng nhanh</span>
+        </div>
+        <div className="flex flex-col justify-center">
+          <div className="advan__item w-[150px]">
+            <img src={advcert} alt="" className="h-[150px]" />
+          </div>
+          <span className="text-lg font-semibold">Bảo vệ quyền lợi</span>
+        </div>
+        <div className="flex flex-col justify-center">
+          <div className="advan__item w-[150px]">
+            <img src={advgeo} alt="" className="h-[150px]" />
+          </div>
+          <span className="text-lg font-semibold">Giao hàng toàn quốc</span>
+        </div>
       </div>
     </>
   );

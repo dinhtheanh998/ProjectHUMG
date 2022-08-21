@@ -68,7 +68,7 @@ const HomeProfit = () => {
   const countCancel = coutOrder("Đã hủy", dataProfit);
   return (
     <>
-      <div className="py-10 -mx-8 bg-blue-300">
+      <div className="py-10 bg-blue-300">
         <div className="flex flex-wrap gap-y-4 ">
           <CalcOrder
             title="Tổng số hàng"

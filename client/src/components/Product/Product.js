@@ -23,18 +23,38 @@ const Product = ({
   });
 
   const { addToCart } = useCart();
-  useLayoutEffect(() => {
+  useEffect(() => {
     setLoading(true);
+    let unmounted = false;
+    let source = axios.CancelToken.source();
     axios
       .get(`/api/productsInfo/product=${data._id}&distinct=color`)
       .then((res) => {
-        setInfoColor(res.data);
-        setLoading(false);
-      });
+        if (!unmounted) {
+          setInfoColor(res.data);
+          setLoading(false);
+        }
+      }).catch((err) => { 
+        if(!unmounted){
+          setLoading(false);
+        }
+        if(axios.isCancel(err)){
+          console.log("request canceled:"+ err.message);
+        } else {
+          console.log("another error:" + err.message);
+        }
+      })
+      ;
+    return () => {
+      unmounted = true;
+      source.cancel("cancel request");
+    }
   }, [data._id]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     setLoading(true);
+    let unmounted = false;
+    let source = axios.CancelToken.source();
     axios
       .get(
         `/api/productsInfo/getSizeFromColor/id=${data._id}&color=${color?.slice(
@@ -42,9 +62,25 @@ const Product = ({
         )}`
       )
       .then((res) => {
-        setInfoSize2(res?.data[0]?.size);
-        setLoading(false);
+        if (!unmounted) {
+          setInfoSize2(res?.data[0]?.size);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!unmounted) {
+          setLoading(false);
+          if (axios.isCancel(err)) {
+            console.log("Request canceled", err);
+          } else {
+            console.log("another error", err);
+          }
+        }
       });
+    return () => {
+      unmounted = true;
+      source.cancel("Cancelling in cleanup");
+    };
   }, [color, data._id]);
   const handleGetInfo = (e) => {
     if (e.target.closest(".product-color")) {
@@ -70,7 +106,7 @@ const Product = ({
 
   return (
     <div
-      className="relative p-2 overflow-hidden bg-white rounded-lg cursor-pointer product-wrap page-container"
+      className="relative w-full p-2 overflow-hidden bg-white rounded-lg cursor-pointer product-wrap page-container hover:shadow-lg group"
       onClick={(e) => {
         // navigate(`/san-pham/${data._id}`);
         handleClickProduct(e);
@@ -85,10 +121,9 @@ const Product = ({
               <img
                 src={`/images/${data.images}`}
                 alt=""
-                className="object-cover w-full h-full"
+                className="object-cover w-full h-full transition duration-500 ease-in-out group-hover:scale-110 group-hover:opacity-70"
               />
             </div>
-
             <div className="absolute bottom-0 flex flex-wrap items-center gap-2 px-3 py-3 text-white transition-all translate-y-full group-hover:visible group-hover:translate-y-0 pro-size">
               {infoSize2 &&
                 infoSize2.length > 0 &&

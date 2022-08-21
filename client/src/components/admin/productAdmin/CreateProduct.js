@@ -72,6 +72,7 @@ const CreateProduct = () => {
   const [image, setImage] = useState(null);
   const [cateData, setCateData] = useState();
   const [supplierData, setSupplierData] = useState();
+  const [excelFile, setExcelFile] = useState();
   const onChangePicture = (e) => {
     if (e.target.files[0]) {
       setImage(e.target.files[0]);
@@ -96,7 +97,7 @@ const CreateProduct = () => {
   useEffect(() => {
     axios.get("/api/category").then((res) => {
       setCateData(res.data);
-    })    
+    });
   }, []);
 
   const handleOnSubmit = (data) => {
@@ -107,15 +108,134 @@ const CreateProduct = () => {
     formData.append("images", image);
     formData.append("description", data.description);
     formData.append("categories", data.categories);
-    axios.post("/api/products", formData).then((res) => {
-      if (res.status === 200) notify();
-      setTimeout(() => {
-        navigate("/admin/product-Admin");
-      }, 1500);
-    });
+    // axios.post("/api/products", formData).then((res) => {
+    //   if (res.status === 200) notify();
+    //   setTimeout(() => {
+    //     navigate("/admin/product-Admin");
+    //   }, 1500);
+    // });
   };
+  const handleImportExcel = (e) => {
+    e.preventDefault();
+    console.log(excelFile)
+    const formData = new FormData();
+    formData.append("upFileExcel", excelFile);
+    axios.post("/api/products/importExcel", formData).then((res) => {
+      console.log(res)
+    })
+
+  }
   return (
     <>
+      {/* Import */}
+      <form onSubmit={handleImportExcel}>
+        <label
+          htmlFor="importExcel"
+          className="flex items-center px-6 py-2 mb-4 font-semibold text-white bg-pink-400 rounded-lg cursor-pointer select-none gap-x-3"
+        >
+          <span>
+            <svg
+              viewBox="0 0 256 256"
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-6 h-6"
+            >
+              <rect fill="none" height="256" width="256" />
+              <line
+                fill="none"
+                stroke="#fff"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="10"
+                x1="152"
+                x2="208"
+                y1="96"
+                y2="96"
+              />
+              <line
+                fill="none"
+                stroke="#fff"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="10"
+                x1="152"
+                x2="208"
+                y1="160"
+                y2="160"
+              />
+              <path
+                d="M64,72V40a8,8,0,0,1,8-8H200a8,8,0,0,1,8,8V216a8,8,0,0,1-8,8H72a8,8,0,0,1-8-8V184"
+                fill="none"
+                stroke="#fff"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="10"
+              />
+              <line
+                fill="none"
+                stroke="#fff"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="10"
+                x1="136"
+                x2="136"
+                y1="184"
+                y2="224"
+              />
+              <line
+                fill="none"
+                stroke="#fff"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="10"
+                x1="136"
+                x2="136"
+                y1="32"
+                y2="72"
+              />
+              <rect
+                fill="none"
+                height="112"
+                rx="8"
+                stroke="#fff"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="10"
+                width="120"
+                x="32"
+                y="72"
+              />
+              <line
+                fill="none"
+                stroke="#fff"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="10"
+                x1="74"
+                x2="110"
+                y1="104"
+                y2="152"
+              />
+              <line
+                fill="none"
+                stroke="#fff"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="10"
+                x1="110"
+                x2="74"
+                y1="104"
+                y2="152"
+              />
+            </svg>
+          </span>
+          <span>Import</span>
+          <input type="file" id="importExcel" name="upFileExcel" hidden onChange={(e) => {
+            setExcelFile(e.target.files[0]);
+          }}/>
+        </label>
+        <input type="submit" value="Submit" className="px-3 py-2 bg-red-300 border border-gray-300" />
+      </form>
+
       <form
         className="px-10 py-4 bg-white rounded-xl"
         onSubmit={handleSubmit(handleOnSubmit)}
@@ -226,9 +346,12 @@ const CreateProduct = () => {
                 alt=""
                 className="object-cover w-full h-full rounded-lg"
               />
-              <span className="absolute w-[40px] h-[40px] rounded-full top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4 bg-slate-200 flex items-center justify-center text-2xl font-semibold z-10 opacity-0 group-hover:opacity-100 transition-all cursor-pointer" onClick={()=> {
-                setImgData(null)
-              }}>
+              <span
+                className="absolute w-[40px] h-[40px] rounded-full top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4 bg-slate-200 flex items-center justify-center text-2xl font-semibold z-10 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                onClick={() => {
+                  setImgData(null);
+                }}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="w-6 h-6"

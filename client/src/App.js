@@ -8,6 +8,7 @@ import HomeAdmin from "./components/admin/HomeAdmin/HomeAdmin";
 import OrderAdmin from "./components/admin/OrderAdmin/OrderAdmin";
 import CreateProduct from "./components/admin/productAdmin/CreateProduct";
 import CreateProductDetailAdmin from "./components/admin/productAdmin/CreateProductDetailAdmin";
+import EditInfoProduct from "./components/admin/productAdmin/EditInfoProduct";
 import EditProduct from "./components/admin/productAdmin/EditProduct";
 import ProductAdmin from "./components/admin/productAdmin/ProductAdmin";
 import ProductDetailsAdmin from "./components/admin/productAdmin/ProductDetailsAdmin";
@@ -20,6 +21,9 @@ import ProductPage from "./components/form/Product/ProductPage";
 import Base from "./components/pageBase/Base";
 import Home from "./components/pageHome/Home";
 import ProductDetail from "./components/Product/ProductDetail";
+import ManagerUser from "./components/ProfileUser/ManagerUser";
+import OrderUser from "./components/ProfileUser/OrderUser";
+import ProfileUser from "./components/ProfileUser/ProfileUser";
 import ExchangeRequest from "./components/requestClient/ExchangeRequest";
 import Request from "./components/requestClient/Request";
 import ReturnRequest from "./components/requestClient/ReturnRequest";
@@ -31,12 +35,20 @@ function App() {
         {/* Client Side */}
         <Route path="/" element={<Base></Base>}>
           <Route index element={<Home></Home>}></Route>
+          <Route path="/trang-chu" element={<Home></Home>}></Route>
           <Route path="/san-pham" element={<ProductPage></ProductPage>}></Route>
           <Route
             path="/san-pham/:sanphamid"
             element={<ProductDetail></ProductDetail>}
           ></Route>
           <Route path="cart" element={<Cart></Cart>}></Route>
+          <Route path="manager-user" element={<ManagerUser></ManagerUser>}>
+            <Route
+              path="profile-user"
+              element={<ProfileUser></ProfileUser>}
+            ></Route>
+            <Route path="order-user" element={<OrderUser></OrderUser>}></Route>
+          </Route>
           <Route
             path="chinh-sach-doi-tra"
             element={<Request></Request>}
@@ -74,6 +86,12 @@ function App() {
             path="ProductDetailsAdmin/:infoId"
             element={<ViewProductDetails></ViewProductDetails>}
           ></Route>
+
+          <Route
+            path="EditInfoProduct/:infoId"
+            element={<EditInfoProduct></EditInfoProduct>}
+          ></Route>
+
           <Route
             path="ProductDetailsAdmin/add-productDetails"
             element={<CreateProductDetailAdmin></CreateProductDetailAdmin>}
@@ -87,9 +105,18 @@ function App() {
             element={<CategoryForm></CategoryForm>}
           ></Route>
           <Route path="OrderAdmin" element={<OrderAdmin></OrderAdmin>}></Route>
-          <Route path="returnRequest" element={<ReturnRequestAdmin></ReturnRequestAdmin>}></Route>
-          <Route path="exchangeRequest" element={<ExchangeRequestAdmin></ExchangeRequestAdmin>}></Route>
-          <Route path="account" element={<ManagerAccount></ManagerAccount>}></Route>          
+          <Route
+            path="returnRequest"
+            element={<ReturnRequestAdmin></ReturnRequestAdmin>}
+          ></Route>
+          <Route
+            path="exchangeRequest"
+            element={<ExchangeRequestAdmin></ExchangeRequestAdmin>}
+          ></Route>
+          <Route
+            path="account"
+            element={<ManagerAccount></ManagerAccount>}
+          ></Route>
         </Route>
       </Routes>
     </Fragment>

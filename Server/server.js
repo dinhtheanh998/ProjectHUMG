@@ -14,6 +14,7 @@ global.returnRequest = require("./models/returnRequestModel");
 global.exchangeRequest = require("./models/exchangeRequest");
 global.ProductInfo = require("./models/productInfoModel");
 global.Order = require("./models/OrderModel");
+global.User = require("./models/userModel");
 global.OrderDetails = require("./models/orderDetailsModel");
 const routes = require("./routers");
 

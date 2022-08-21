@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import BottomBodyAdm from "../BottomBodyAdm";
 import ReactDOM from "react-dom";
 import { NavLink, useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx";
 import axios from "axios";
 import {
   converCurences,
@@ -11,6 +12,15 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import ChartPriceByTime from "./ChartPriceByTime";
 import { data } from "../HomeAdmin/ChartData";
+import UpDateProductFromExcel from "./UpDateProductFromExcel";
+const downloadExcel = (data) => {
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+  //let buffer = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
+  //XLSX.write(workbook, { bookType: "xlsx", type: "binary" });
+  XLSX.writeFile(workbook, "Product.xlsx");
+};
 
 const ProductAdmin = () => {
   const navigate = useNavigate();
@@ -21,6 +31,7 @@ const ProductAdmin = () => {
     show: false, // initial values set to false and null
     id: null,
   });
+  const [updateFileExcel, setUpdateFileExcel] = useState(null);
   const [showChart, SetShowChart] = useState(false);
 
   const handleDelete = (id) => {
@@ -61,7 +72,6 @@ const ProductAdmin = () => {
       setPriceByTime(data[0]?.price?.flat());
     });
   };
-  console.log(priceByTime);
 
   const handleClickOptions = (e, index) => {
     if (showOption === index) setShowOption(null);
@@ -71,16 +81,114 @@ const ProductAdmin = () => {
     setShowOption(null);
   });
 
+  const handleUpdateByExcel = (e) => {
+    e.preventDefault();
+    console.log(updateFileExcel);
+    const formData = new FormData();
+    formData.append("upFileExcel", updateFileExcel);
+    axios.put("/api/products/updateExcel", formData).then((res) => {
+      console.log(res.data);
+    });
+  };
   return (
     <>
       <BottomBodyAdm>
-        <NavLink
-          to="add-product"
-          type="button"
-          className="px-5 py-3 mb-4 font-semibold text-white bg-blue-400 rounded-lg hover:text-white"
-        >
-          Thêm sản phẩm
-        </NavLink>
+        <div className="flex items-center justify-between mt-3 gap-x-5">
+          <NavLink
+            to="add-product"
+            type="button"
+            className="px-5 py-2 mb-4 font-semibold text-white bg-blue-400 rounded-lg hover:text-white"
+          >
+            Thêm sản phẩm
+          </NavLink>
+          <div className="flex items-center gap-x-5">
+            {/* <span className="px-6 py-2 mb-4 font-semibold text-white bg-pink-400 rounded-lg cursor-pointer select-none b-4 gap-x-3">Cập nhật bằng file excel</span> */}
+            <UpDateProductFromExcel></UpDateProductFromExcel>
+            {/* <form onSubmit={handleUpdateByExcel} className="flex items-center mb-4 font-semibold text-white cursor-pointer gap-x-3">
+              <label
+                htmlFor="updateByExcel"
+              >
+                <input
+                  type="file"
+                  id="updateByExcel"
+                  hidden
+                  name="upFileExcel"
+                  onChange={(e) => {
+                    setUpdateFileExcel(e.target.files[0]);
+                  }}
+                />
+                <span className="w-full h-full px-6 py-2 bg-pink-400 rounded-lg cursor-pointer select-none">{updateFileExcel?.name || "Cập nhật bằng file excel"}</span>
+              </label>
+              {updateFileExcel && <button type="submit" value="Submit" className="w-full h-full px-6 py-2 bg-pink-800 rounded-lg">Xác nhận</button>}
+            </form> */}
+            {/* Export */}
+            <button
+              className="flex items-center px-6 py-2 mb-4 font-semibold text-white bg-green-400 rounded-lg cursor-pointer select-none gap-x-3"
+              onClick={() => {
+                downloadExcel(dataPro);
+              }}
+            >
+              <span>
+                <svg
+                  version="1.1"
+                  viewBox="0 0 128 128"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-6 h-6"
+                  strokeWidth="10"
+                >
+                  <g id="Exel_download">
+                    <g>
+                      <g>
+                        <path
+                          d="M80.016,96h-8.297L63.75,83.039L55.781,96H48l11.367-17.672L48.727,61.734h8.016l7.383,12.328     l7.242-12.328h7.828L68.438,78.727L80.016,96z"
+                          fill="#fff"
+                        />
+                      </g>
+                      <g>
+                        <g>
+                          <path
+                            d="M104,80c-13.255,0-24,10.745-24,24s10.745,24,24,24s24-10.745,24-24S117.255,80,104,80z       M114.882,96.988l-0.113,0.176l-8.232,11.438C105.989,109.468,105.029,110,104,110s-1.989-0.532-2.536-1.397l-8.346-11.614      c-0.529-0.926-0.524-2.073,0.01-2.994c0.535-0.922,1.53-1.494,2.596-1.494H100V86c0-1.654,1.346-3,3-3h2c1.654,0,3,1.346,3,3      v6.5h4.276c1.065,0,2.061,0.572,2.596,1.494C115.406,94.915,115.411,96.063,114.882,96.988z"
+                            fill="#fff"
+                          />
+                        </g>
+                        <g>
+                          <g>
+                            <polygon
+                              points="84,125.95 83.95,126 84,126      "
+                              fill="#FF9A30"
+                            />
+                          </g>
+                          <g>
+                            <polygon
+                              points="114,77 114,76.95 113.95,77      "
+                              fill="#FF9A30"
+                            />
+                          </g>
+                          <g>
+                            <path
+                              d="M111.071,44.243L71.757,4.929C69.869,3.041,67.357,2,64.687,2H24c-5.514,0-10,4.486-10,10v104       c0,5.514,4.486,10,10,10h59.95l-4-4H24c-3.309,0-6-2.691-6-6V12c0-3.309,2.691-6,6-6h40.687c1.603,0,3.109,0.624,4.242,1.757       l39.314,39.314c1.116,1.117,1.757,2.663,1.757,4.242V72.95l4,4V51.313C114,48.643,112.96,46.132,111.071,44.243z"
+                              fill="#fff"
+                              stroke="#fff"
+                              strokeWidth="5"
+                            />
+                          </g>
+                          <g>
+                            <polyline
+                              points="113.95,77 114,76.95 110,72.95      "
+                              fill="#FFFFFF"
+                            />
+                          </g>
+                        </g>
+                      </g>
+                    </g>
+                  </g>
+                </svg>
+              </span>
+              <span>Export</span>
+            </button>
+          </div>
+        </div>
+
         <div>
           <div className="grid grid-cols-10  p-3 font-semibold text-sm text-[#c6cad2]">
             <span className="col-start-1 col-end-4 mr-4">Thông tin</span>
@@ -214,7 +322,9 @@ const ProductAdmin = () => {
             setPriceByTime={setPriceByTime}
           ></ChartShow>
         )}
-        {!priceByTime && showChart &&<p>Sản phẩm này chưa bán được đâu azai</p>}
+        {!priceByTime && showChart && (
+          <p>Sản phẩm này chưa bán được đâu azai</p>
+        )}
       </BottomBodyAdm>
     </>
   );
@@ -263,16 +373,15 @@ function Popup({ handleDeleteTrue, handleDeleteFalse }) {
   );
 }
 
-function ChartShow({ data, SetShowChart,setPriceByTime }) {
+function ChartShow({ data, SetShowChart, setPriceByTime }) {
   return ReactDOM.createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-5 rounded-lg modal">
       <div
         className={`fixed inset-0 z-50 flex items-center justify-center bg-black opacity-20 p-5  modal `}
-        onClick={() => { 
-          SetShowChart(null)
-          setPriceByTime(undefined)
+        onClick={() => {
+          SetShowChart(null);
+          setPriceByTime(undefined);
         }}
-      
       ></div>
       <div className="absolute z-[99999] flex flex-col items-center mx-auto gap-y-5 justify-center bg-white p-10 rounded-lg w-[700px]">
         <ChartPriceByTime data={data}></ChartPriceByTime>
@@ -283,4 +392,3 @@ function ChartShow({ data, SetShowChart,setPriceByTime }) {
 }
 
 export default ProductAdmin;
- 

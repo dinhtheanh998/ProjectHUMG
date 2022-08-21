@@ -1,11 +1,27 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
+import SwiperCore, { Pagination,Autoplay  }  from "swiper";
 import "swiper/css";
-
+import "swiper/css/pagination";
+import "./Slidecss.scss"
 const SlideHeaderHome = () => {
+  const pagination = {
+    clickable: true,
+    renderBullet: function (index, className) {
+      return '<span class="'+className+'"> </span>';
+    },
+  };
+  SwiperCore.use([Autoplay])
   return (
     <>
-      <Swiper className="mySwiper h-[800px]" loop={true} slidesPerView={1}>
+      <Swiper
+        className="mySwiper page-container h-[400px] rounded-xl shadow-lg"
+        pagination={pagination}
+        modules={[Pagination]}
+        autoplay={{ delay: 2000 }}
+        loop={true}
+        slidesPerView={1}
+      >
         <SwiperSlide>
           <img
             src="https://images.unsplash.com/photo-1540221652346-e5dd6b50f3e7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1169&q=80"

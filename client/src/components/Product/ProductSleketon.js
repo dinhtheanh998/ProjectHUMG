@@ -4,7 +4,7 @@ const ProductSleketon = () => {
   return (
     <div className="">
       <div className="relative w-full mb-4 overflow-hidden group">
-        <div className="h-[350px] skeleton rounded-lg"></div>
+        <div className="h-[350px] w-[230px] skeleton rounded-lg"></div>
         <div className="absolute bottom-0 flex flex-wrap items-center gap-2 px-3 py-3 text-white transition-all translate-y-full group-hover:visible group-hover:translate-y-0 pro-size bg-"></div>
         <div className="h-2 mt-3 rounded skeleton"></div>
         <div className="grid grid-cols-3 gap-4 mt-2 rounded-lg">
