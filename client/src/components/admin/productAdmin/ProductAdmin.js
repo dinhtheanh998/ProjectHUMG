@@ -12,6 +12,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import ChartPriceByTime from "./ChartPriceByTime";
 import { data } from "../HomeAdmin/ChartData";
+import UpDateProductFromExcel from "./UpDateProductFromExcel";
 const downloadExcel = (data) => {
   const worksheet = XLSX.utils.json_to_sheet(data);
   const workbook = XLSX.utils.book_new();
@@ -30,8 +31,8 @@ const ProductAdmin = () => {
     show: false, // initial values set to false and null
     id: null,
   });
+  const [updateFileExcel, setUpdateFileExcel] = useState(null);
   const [showChart, SetShowChart] = useState(false);
-  console.log(dataPro);
 
   const handleDelete = (id) => {
     setPopup({
@@ -80,6 +81,15 @@ const ProductAdmin = () => {
     setShowOption(null);
   });
 
+  const handleUpdateByExcel = (e) => {
+    e.preventDefault();
+    console.log(updateFileExcel);
+    const formData = new FormData();
+    formData.append("upFileExcel", updateFileExcel);
+    axios.put("/api/products/updateExcel", formData).then((res) => {
+      console.log(res.data);
+    });
+  };
   return (
     <>
       <BottomBodyAdm>
@@ -92,105 +102,25 @@ const ProductAdmin = () => {
             Thêm sản phẩm
           </NavLink>
           <div className="flex items-center gap-x-5">
-            {/* Import */}
-            <label
-              htmlFor="importExcel"
-              className="flex items-center px-6 py-2 mb-4 font-semibold text-white bg-pink-400 rounded-lg cursor-pointer select-none gap-x-3"
-            >
-              <span>
-                <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6">
-                  <rect fill="none" height="256" width="256" />
-                  <line
-                    fill="none"
-                    stroke="#fff"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="10"
-                    x1="152"
-                    x2="208"
-                    y1="96"
-                    y2="96"
-                  />
-                  <line
-                    fill="none"
-                    stroke="#fff"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="10"
-                    x1="152"
-                    x2="208"
-                    y1="160"
-                    y2="160"
-                  />
-                  <path
-                    d="M64,72V40a8,8,0,0,1,8-8H200a8,8,0,0,1,8,8V216a8,8,0,0,1-8,8H72a8,8,0,0,1-8-8V184"
-                    fill="none"
-                    stroke="#fff"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="10"
-                  />
-                  <line
-                    fill="none"
-                    stroke="#fff"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="10"
-                    x1="136"
-                    x2="136"
-                    y1="184"
-                    y2="224"
-                  />
-                  <line
-                    fill="none"
-                    stroke="#fff"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="10"
-                    x1="136"
-                    x2="136"
-                    y1="32"
-                    y2="72"
-                  />
-                  <rect
-                    fill="none"
-                    height="112"
-                    rx="8"
-                    stroke="#fff"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="10"
-                    width="120"
-                    x="32"
-                    y="72"
-                  />
-                  <line
-                    fill="none"
-                    stroke="#fff"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="10"
-                    x1="74"
-                    x2="110"
-                    y1="104"
-                    y2="152"
-                  />
-                  <line
-                    fill="none"
-                    stroke="#fff"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="10"
-                    x1="110"
-                    x2="74"
-                    y1="104"
-                    y2="152"
-                  />
-                </svg>
-              </span>
-              <span>Import</span>
-              <input type="file" id="importExcel" hidden />
-            </label>
+            {/* <span className="px-6 py-2 mb-4 font-semibold text-white bg-pink-400 rounded-lg cursor-pointer select-none b-4 gap-x-3">Cập nhật bằng file excel</span> */}
+            <UpDateProductFromExcel></UpDateProductFromExcel>
+            {/* <form onSubmit={handleUpdateByExcel} className="flex items-center mb-4 font-semibold text-white cursor-pointer gap-x-3">
+              <label
+                htmlFor="updateByExcel"
+              >
+                <input
+                  type="file"
+                  id="updateByExcel"
+                  hidden
+                  name="upFileExcel"
+                  onChange={(e) => {
+                    setUpdateFileExcel(e.target.files[0]);
+                  }}
+                />
+                <span className="w-full h-full px-6 py-2 bg-pink-400 rounded-lg cursor-pointer select-none">{updateFileExcel?.name || "Cập nhật bằng file excel"}</span>
+              </label>
+              {updateFileExcel && <button type="submit" value="Submit" className="w-full h-full px-6 py-2 bg-pink-800 rounded-lg">Xác nhận</button>}
+            </form> */}
             {/* Export */}
             <button
               className="flex items-center px-6 py-2 mb-4 font-semibold text-white bg-green-400 rounded-lg cursor-pointer select-none gap-x-3"

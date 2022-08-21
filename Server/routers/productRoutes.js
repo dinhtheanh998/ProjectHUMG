@@ -8,6 +8,8 @@ router.get("/getAllProduct", productBuilder.getAllProduct);
 router.get("/getProductByQuery/?query=:query", productBuilder.findProductByQuery);
 // router.get("/getProductByQuery", productBuilder.findProductByQuery);
 router.post("/", productBuilder.uploadImage, productBuilder.create_a_product);
+router.post("/importExcel",productBuilder.uploadExcel, productBuilder.postFromExcel);
+router.put("/updateExcel",productBuilder.uploadExcel, productBuilder.putFromExcel);
 // router.post("/", productBuilder.create_a_task);
 router.get("/:productId", productBuilder.getAProduct);
 // router.get("/sum", productBuilder.sumQuantity);

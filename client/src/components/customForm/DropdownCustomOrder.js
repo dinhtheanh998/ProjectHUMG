@@ -43,6 +43,18 @@ const DropDownCustomOrder = ({
           );
         });
       }
+      if (e.target.dataset.value === "Đã hủy") {        
+          item.details.forEach((el) => {
+            // console.log(`/api/productsInfo/updateQuantity/id=${el._id}&color=${el.color.slice(1)}&size=${el.size}&quantity=${el.quantity}`);
+            axios.put(
+              `/api/productsInfo/updateQuantity/id=${
+                el._id
+              }&color=${el.color.slice(1)}&size=${el.size}&quantity=${
+                -el.quantity
+              }`
+            );
+          });
+      }
     }
     if (search) {
       axios.get(`/api/order/getOrderByState/state=${e.target.dataset.value}`).then((res) => { 
