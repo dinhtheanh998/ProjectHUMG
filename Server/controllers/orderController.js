@@ -290,3 +290,92 @@ exports.getOrderbyUser = (req, res) => {
     }
   );
 }
+
+exports.getProfitBySelectDay = (req, res) => {
+  console.log(+req.params.day);
+  order.aggregate(
+    [
+      {
+        $project: {
+          state: 1,
+          day: { $dayOfMonth: "$updatedAt" },
+          month: { $month: "$updatedAt" },
+          year: { $year: "$updatedAt" },
+          total: 1,
+        },
+      },
+      {
+        $match: {
+          state: "Thành công",
+          day: +req.params.day,
+          month: +req.params.month,
+          year: +req.params.year,
+        },
+      },
+      {
+        $group: {
+          _id: "$state",
+          total: { $sum: "$total" },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          state: "$_id",
+          total: 1,
+          count: 1,
+        },
+      },
+    ],
+    (err, orders) => {
+      if (err) res.send(err);
+      res.json(orders);
+    }
+  );
+}
+
+exports.getOrderByDateRange = (req, res) => {
+  console.log(req.params);
+  order.aggregate(
+    [
+      {
+        $project: {
+          state: 1,
+          updatedAt: 1,
+          // day: { $dayOfMonth: "$updatedAt" },
+          // month: { $month: "$updatedAt" },
+          // year: { $year: "$updatedAt" },
+          total: 1,
+        },
+      },
+      {
+        $match: {
+          state: "Thành công",
+          updatedAt: { $gte: new Date(req.params.startDate), $lte: new Date(req.params.endDate) },
+          // day: { $gte: +req.params.day1, $lte: +req.params.day2 },
+          // month: { $gte: +req.params.month1, $lte: +req.params.month2 },
+          // year: { $gte: +req.params.year1, $lte: +req.params.year2 },
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%d/%m/%Y", date: "$updatedAt" } },
+          total: { $sum: "$total" },
+          count: { $sum: 1 },
+          updatedAt: { $first: "$updatedAt" },
+        },
+      },
+      {
+        $project: {          
+          total: 1,
+          count: 1,
+          updatedAt: 1,
+        },
+      },
+    ],
+    (err, orders) => {
+      if (err) res.send(err);
+      res.json(orders);
+    }
+  ).sort({updatedAt:1});
+}

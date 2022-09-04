@@ -48,7 +48,7 @@ const InfoProduct = ({ item , navigate }) => {
       <div className="flex items-center col-start-1 col-end-4 mr-4 gap-x-2">
         <div className="w-[100px] h-[100px] rounded-lg">
           <img
-            src={`/images/${item.productInfo.images}`}
+            src={`/images/${item.productInfo.images[0]}`}
             alt=""
             className="object-cover w-full h-full rounded-lg"
           />

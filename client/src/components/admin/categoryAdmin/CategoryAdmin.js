@@ -1,11 +1,12 @@
 import React from 'react';
 import Category from '../../form/Category/Category';
+import BottomBodyAdm from '../BottomBodyAdm';
 
 const CategoryAdmin = () => {
     return (
-        <div>
+        <BottomBodyAdm>
             <Category></Category>
-        </div>
+        </BottomBodyAdm>
     );
 };
 

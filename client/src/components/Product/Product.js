@@ -10,10 +10,9 @@ const Product = ({
   //
   data,
 }) => {
-  // const [infoSize, setInfoSize] = useState();
   const [color, setColor] = useState();
-  const [infoSize2, setInfoSize2] = useState();
-  const [infoColor, setInfoColor] = useState();
+  const [size, setSize] = React.useState([]);
+  const [infoPro, setInfoPro] = useState();
   const proRef = useRef();
   const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(null);
@@ -23,15 +22,16 @@ const Product = ({
   });
 
   const { addToCart } = useCart();
+  console.log("data",data)
   useEffect(() => {
     setLoading(true);
     let unmounted = false;
     let source = axios.CancelToken.source();
     axios
-      .get(`/api/productsInfo/product=${data._id}&distinct=color`)
+      .get(`/api/products/getInfoProduct/${data._id}`)
       .then((res) => {
         if (!unmounted) {
-          setInfoColor(res.data);
+          setInfoPro(res.data);
           setLoading(false);
         }
       }).catch((err) => { 
@@ -50,50 +50,21 @@ const Product = ({
       source.cancel("cancel request");
     }
   }, [data._id]);
-
-  useEffect(() => {
-    setLoading(true);
-    let unmounted = false;
-    let source = axios.CancelToken.source();
-    axios
-      .get(
-        `/api/productsInfo/getSizeFromColor/id=${data._id}&color=${color?.slice(
-          1
-        )}`
-      )
-      .then((res) => {
-        if (!unmounted) {
-          setInfoSize2(res?.data[0]?.size);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (!unmounted) {
-          setLoading(false);
-          if (axios.isCancel(err)) {
-            console.log("Request canceled", err);
-          } else {
-            console.log("another error", err);
-          }
-        }
-      });
-    return () => {
-      unmounted = true;
-      source.cancel("Cancelling in cleanup");
-    };
-  }, [color, data._id]);
+  console.log(infoPro)
   const handleGetInfo = (e) => {
     if (e.target.closest(".product-color")) {
       const index = +e.target.closest(".product-color").dataset.index;
       setActiveIndex(index);
-      setColor(e.target.closest(".product-color").dataset.color);
+      // setColor(e.target.closest(".product-color").dataset.color);
       // console.log(e.target.closest(".product-color").dataset.color);
-      setProductData((prev) => ({
+      setProductData((prev) => ({        
         ...prev,
         color: e.target.closest(".product-color").dataset.color,
-        quantity: 1,
+        quantity: 1,       
       }));
+      setSize(infoPro[index].size);
     }
+    
   };
 
   const handleClickProduct = (e) => {
@@ -119,20 +90,21 @@ const Product = ({
           <div className="relative w-full mb-4 overflow-hidden rounded-lg group">
             <div className="w-full h-[350px]">
               <img
-                src={`/images/${data.images}`}
+                src={`/images/${data.images[0]}`}
                 alt=""
                 className="object-cover w-full h-full transition duration-500 ease-in-out group-hover:scale-110 group-hover:opacity-70"
               />
             </div>
             <div className="absolute bottom-0 flex flex-wrap items-center gap-2 px-3 py-3 text-white transition-all translate-y-full group-hover:visible group-hover:translate-y-0 pro-size">
-              {infoSize2 &&
-                infoSize2.length > 0 &&
-                infoSize2.map((size, i) => {
+              {size &&
+                size.length > 0 &&
+                size.map((size, i) => {
                   return (
                     <ProductSize
                       size={size}
                       key={uuidv4()}
                       addToCart={addToCart}
+                      indexM = {i}
                       data={productData}
                       activeIndex={activeIndex}
                     ></ProductSize>
@@ -141,16 +113,17 @@ const Product = ({
             </div>
           </div>
           <div className="flex items-center gap-x-3 pro-color">
-            {infoColor &&
-              infoColor.length > 0 &&
-              infoColor.map((color, i) => {
+            {infoPro &&
+              infoPro.length > 0 &&
+              infoPro.map((info, i) => {
                 return (
                   <ProductColor
-                    color={color}
+                    color={info._id.color}
                     key={i}
                     onClick={handleGetInfo}
                     index={i}
                     activeIndex={activeIndex}
+                    dataSize = {info.size}
                   ></ProductColor>
                 );
               })}
@@ -179,11 +152,14 @@ const Product = ({
   );
 };
 
-const ProductSize = ({ size, addToCart, data, activeIndex }) => {
+const ProductSize = ({ size, addToCart, data, activeIndex , indexM }) => {
+  console.log("ProductData", data);
   return (
     <label
       htmlFor="size"
-      onClick={() => addToCart({ ...data, size }, activeIndex)}
+      onClick={() => addToCart({
+        ...data, size, 
+      }, activeIndex)}
       className="z-10"
     >
       <input type="text" defaultValue={size} className="hidden" name="size" />
@@ -194,7 +170,8 @@ const ProductSize = ({ size, addToCart, data, activeIndex }) => {
   );
 };
 
-const ProductColor = ({ color, onClick, index, activeIndex }) => {
+const ProductColor = ({ color, onClick, index, activeIndex, dataSize }) => {
+ 
   return (
     <div
       className={`px-4 py-2 mb-2 border  rounded-lg cursor-pointer product-color ${
@@ -203,11 +180,11 @@ const ProductColor = ({ color, onClick, index, activeIndex }) => {
       data-color={color}
       onClick={onClick}
       data-index={index}
+      data-size={dataSize}
       style={{
         backgroundColor: color,
       }}
     >
-      {/* <span className="font-semibold ">{color}</span> */}
     </div>
   );
 };

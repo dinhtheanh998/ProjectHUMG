@@ -4,7 +4,7 @@ import { useEffect } from "react";
 export const options = (title) => {
   return {
     interaction: {
-      mode: 'index',
+      mode: "index",
       intersect: false,
     },
     stacked: false,
@@ -18,15 +18,19 @@ export const options = (title) => {
       },
     },
     scales: {
-      y: {
-        type: 'linear',
-        display: true,
-        position: 'left',
-      },      
+      y:
+        {
+          min: 0,
+          stepSize: 10,
+        },
+      x:
+        {
+          
+        },
     },
     // responsive: true,
   };
-}
+};
 
 export const handleData = (data, labels) => {
   if (!data) return;
@@ -44,17 +48,18 @@ export const handleData = (data, labels) => {
     });
 };
 
-export const data = (xData, labels) => {
+export const data = (xData, labels,tension=0) => {
   return {
     labels,
     datasets: [
       {
-        label: "Doanh số",
+        label: "Doanh thu",
         data: xData,
         backgroundColor: "rgba(243, 241, 245, 0.6)",
-        borderColor: '#66BFBF',        
-        yAxisID: 'y',
-        fill:true,
+        borderColor: "#66BFBF",
+        yAxisID: "y",
+        fill: true,
+        tension: tension,
       },
     ],
   };

@@ -7,7 +7,6 @@
   body {
     @apply font-body;
     position: relative;
-    
   }
 }
 
@@ -107,7 +106,31 @@
     }
   }
 
-  
+  .custom-radio {
+    width: 10px;
+    height: 10px;
+    position: relative;
+  }
+  .custom-radio::after {
+    content: "";
+    width: 25px;
+    height: 25px;
+    border-radius: 100rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .custom-radio > div {
+    box-shadow: 0 0 0 5px #fff;
+  }
+
+  .custom-radio input:checked + div {
+    @apply bg-blue-500;
+    box-shadow: 0 0 0 2.5px #fff,
+      0 0 0 5px rgb(59 130 246 / var(--tw-bg-opacity));
+  }
 }
 @layer utilities {
   .scrollbar::-webkit-scrollbar {

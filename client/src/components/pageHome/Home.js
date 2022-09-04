@@ -21,6 +21,7 @@ const Home = () => {
       setProducts(response.data);
     });
   }, []);
+  console.log("List Product", products)
   // useEffect(() => {
   //   axios.get(`api/category/getlimitCate/limit=0`).then((response) => {
   //     setCateData(response.data);

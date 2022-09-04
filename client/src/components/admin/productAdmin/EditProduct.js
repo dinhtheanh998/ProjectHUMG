@@ -6,7 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import * as yup from "yup";
 import { notifySuccess } from "../../../config/config";
 import DropDownCustom from "../../customForm/DropDownCustom";
-
+import { v4 as uuidv4 } from "uuid";
 const schema = yup.object().shape({
   name: yup.string().required("Tên sản phẩm không được để trống"),
   unitPrice: yup
@@ -47,19 +47,20 @@ const fakeData2 = [
 ];
 
 const EditProduct = () => {
+  let fileArray = [];
+  let fileObj = [];
   const { productid } = useParams();
   const [dataAProduct, setDataAProduct] = useState();
   const [cateData, setCateData] = useState();
   const [imgData, setImgData] = useState(null);
   const [defaultImg, setDefaultImg] = useState(null);
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState([]);
   const navigate = useNavigate();
   const {
     control,
     setValue,
     handleSubmit,
     register,
-
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -67,24 +68,49 @@ const EditProduct = () => {
   });
 
   const onChangePicture = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-      const file = e.target.files[0];
-      file.preview = URL.createObjectURL(file);
-      setImgData(file);
-      setDefaultImg(null)
+    setImage([...e.target.files]);
+    if (e.target.files) {
+      // setImage(e.target.files[0]);
+      fileObj.push(e.target.files);
+      for (let i = 0; i < fileObj[0].length; i++) {
+        fileArray.push(URL.createObjectURL(fileObj[0][i]));
+      }
+      // file.preview = URL.createObjectURL(file);
+      setDefaultImg(fileArray);
     }
+    // console.log([...e.target.files]);
+    // if (e.target.files) {
+    //   // setImage(e.target.files[0]);
+    //   const file = e.target.files[0];
+    //   file.preview = URL.createObjectURL(file);
+    //   // setImgData(file);
+    //   setDefaultImg(null)
+    // }
   };
 
+  const pushImgData = (e) => {
+    if (e.target.files) {
+      setImage((prev) => [...prev, ...e.target.files]);     
+      fileObj.push(e.target.files);
+      for (let i = 0; i < fileObj[0].length; i++) {
+        fileArray.push(URL.createObjectURL(fileObj[0][i]));
+      }
+      setDefaultImg((prev) => [...prev, ...fileArray]);
+    }
+  };
+  // const value = image.some((item) => typeof item === "object");
+  // console.log(value);
+  console.log('defaultImg', defaultImg)
+  console.log('image', image)
   useEffect(() => {
     axios.get(`/api/products/${productid}`).then((res) => {
       setDataAProduct(res.data);
       setDefaultImg(res.data.images)
+      setImage(res.data.images)
     });
   }, [productid]);
 
 
-  console.log(dataAProduct)
 
   useEffect(() => {
     axios.get("/api/category").then((res) => {
@@ -100,20 +126,23 @@ const EditProduct = () => {
       formData.append("description", data.description);
       formData.append("categories", data.categories);
     } else {
+      for (let i = 0; i < image.length; i++) {
+        console.log(typeof image[i]);
+        formData.append("images", image[i]);
+      }
       formData.append("name", data.name);
       formData.append("unitPrice", data.unitPrice);
       formData.append("unitPromotionalPrice", data.unitPromotionalPrice);
-      formData.append("images", image);
+      // formData.append("images", image);
       formData.append("description", data.description);
       formData.append("categories", data.categories);
     }
-    console.log(data)
-    // axios.put(`/api/products/${productid}`, formData).then((res) => {
-    //   if (res.status === 200) notifySuccess("Sửa sản phẩm thành công");
-    //   // setTimeout(() => {
-    //   //   navigate("/admin/product-Admin");
-    //   // }, 1500);
-    // });
+    axios.put(`/api/products/${productid}`, formData).then((res) => {
+      if (res.status === 200) notifySuccess("Sửa sản phẩm thành công");
+      // setTimeout(() => {
+      //   navigate("/admin/product-Admin");
+      // }, 1500);
+    });
     for (const pair of formData.entries()) {
       console.log(`${pair[0]}, ${pair[1]}`);
     }
@@ -233,37 +262,78 @@ const EditProduct = () => {
             )}
             {/* preview image */}
             {(defaultImg || imgData) && (
-              <div className="mb-5 w-[400px] h-[500px] select-none relative group">
-                <img
-                  // src={imgData.preview}
-                  src={defaultImg ? `/images/${defaultImg}` : imgData.preview}
-                  alt=""
-                  className="object-cover w-full h-full rounded-lg"
-                />
-                <span
-                  className="absolute w-[40px] h-[40px] rounded-full top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4 bg-slate-200 flex items-center justify-center text-2xl font-semibold z-10 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
-                  onClick={() => {
-                    setImgData(null);
-                    setDefaultImg(null)
-                  }}
+              <div className="mb-5 w-[100%] select-none relative group">
+              <div className="flex items-center w-full h-full gap-x-4">
+                  {defaultImg.map((item, index) => {
+                  return (
+                    <div
+                      className="w-[100px] h-[100px] relative"
+                      key={uuidv4()}
+                    >
+                      <img
+                        src={`${item.includes('blob:http:') ? item : `/images/${item}`}`}
+                        alt=""
+                        className="object-cover w-full h-full"
+                      />
+                      <span
+                        className="absolute w-[40px] h-[40px] rounded-full top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4 bg-slate-200 flex items-center justify-center text-2xl font-semibold z-10 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                        onClick={() => {
+                          // setImgData(null);
+                          // console.log(index)
+                          defaultImg.splice(index, 1);
+                          // image.splice(index, 1);
+                          setDefaultImg((prev) => [...prev]);
+                          setImage((prev) => [...prev]);
+                        }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-6 h-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                      </span>
+                      <div className="absolute inset-0 transition-all bg-white opacity-0 overlay-preview-img group-hover:opacity-50"></div>
+                    </div>
+                  );
+                })}
+                <label
+                  htmlFor="pushImgData"
+                  className="w-[100px] h-[100px] border cursor-pointer border-dashed border-gray-400 flex items-center justify-center hover:border-solid hover:border-blue-400 transition-all"
                 >
+                  <input
+                    id="pushImgData"
+                    type="file"
+                    multiple
+                    onChange={pushImgData}
+                    hidden
+                  />
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="w-6 h-6"
                     fill="none"
                     viewBox="0 0 24 24"
+                    strokeWidth={1.5}
                     stroke="currentColor"
-                    strokeWidth="2"
+                    className="w-5 h-5"
                   >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      d="M12 4.5v15m7.5-7.5h-15"
                     />
                   </svg>
-                </span>
-                <div className="absolute inset-0 transition-all bg-white opacity-0 overlay-preview-img group-hover:opacity-50"></div>
+                </label>
               </div>
+            </div>
+              
             )}
 
             <p className="text-sm text-red-500">{errors.images?.message}</p>

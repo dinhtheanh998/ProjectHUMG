@@ -104,24 +104,7 @@ const ProductAdmin = () => {
           <div className="flex items-center gap-x-5">
             {/* <span className="px-6 py-2 mb-4 font-semibold text-white bg-pink-400 rounded-lg cursor-pointer select-none b-4 gap-x-3">Cập nhật bằng file excel</span> */}
             <UpDateProductFromExcel></UpDateProductFromExcel>
-            {/* <form onSubmit={handleUpdateByExcel} className="flex items-center mb-4 font-semibold text-white cursor-pointer gap-x-3">
-              <label
-                htmlFor="updateByExcel"
-              >
-                <input
-                  type="file"
-                  id="updateByExcel"
-                  hidden
-                  name="upFileExcel"
-                  onChange={(e) => {
-                    setUpdateFileExcel(e.target.files[0]);
-                  }}
-                />
-                <span className="w-full h-full px-6 py-2 bg-pink-400 rounded-lg cursor-pointer select-none">{updateFileExcel?.name || "Cập nhật bằng file excel"}</span>
-              </label>
-              {updateFileExcel && <button type="submit" value="Submit" className="w-full h-full px-6 py-2 bg-pink-800 rounded-lg">Xác nhận</button>}
-            </form> */}
-            {/* Export */}
+            
             <button
               className="flex items-center px-6 py-2 mb-4 font-semibold text-white bg-green-400 rounded-lg cursor-pointer select-none gap-x-3"
               onClick={() => {
@@ -208,7 +191,7 @@ const ProductAdmin = () => {
                   <div className="flex items-center col-start-1 col-end-4 mr-4 gap-x-3">
                     <div className="w-[100px] h-[100px] rounded-lg">
                       <img
-                        src={`/images/${item.images}`}
+                        src={`/images/${item.images[0]}`}
                         alt=""
                         className="object-cover w-full h-full rounded-lg"
                       />

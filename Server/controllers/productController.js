@@ -34,7 +34,7 @@ const upload = multer({
   fileFilter: isImage,
 });
 
-exports.uploadImage = upload.single("images");
+exports.uploadImage = upload.array("images",8);
 
 exports.list_all_products = (req, res) => {
   product.find({}, (err, products) => {
@@ -101,12 +101,16 @@ exports.getAllProduct = (req, res) => {
 };
 
 exports.create_a_product = (req, res) => {
-  console.log(req.file);
+  const imgArr = [];
+  for (let i = 0; i < req.files.length; i++) {
+    imgArr.push(req.files[i].filename);
+  }
+  console.log(req.files);
   const newProduct = new product({
     name: req.body.name,
     unitPrice: req.body.unitPrice,
     unitPromotionalPrice: req.body.unitPromotionalPrice,
-    images: req.file.filename,
+    images: imgArr,
     description: req.body.description,
     categories: req.body.categories,
     suppliers: req.body.suppliers,
@@ -212,42 +216,63 @@ exports.list_all_products_cate = (req, res) => {
 };
 
 exports.update_a_product = (req, res) => {
-  if (req.file) {
-    product.findOneAndUpdate(
-      { _id: req.params.productId },
-      {
-        name: req.body.name,
-        unitPrice: req.body.unitPrice,
-        unitPromotionalPrice: req.body.unitPromotionalPrice,
-        images: req.file.filename,
-        description: req.body.description,
-        categories: req.body.categories,
-        suppliers: req.body.suppliers,
-      },
-      { new: true },
-      (err, product) => {
-        if (err) res.send(err);
-        res.json(product);
-      }
-    );
-  } else {
-    product.findOneAndUpdate(
-      { _id: req.params.productId },
-      {
-        name: req.body.name,
-        unitPrice: req.body.unitPrice,
-        unitPromotionalPrice: req.body.unitPromotionalPrice,
-        description: req.body.description,
-        categories: req.body.categories,
-        suppliers: req.body.suppliers,
-      },
-      { new: true },
-      (err, product) => {
-        if (err) res.send(err);
-        res.json(product);
-      }
-    );
+  const imgArr = [];
+  for (let i = 0; i < req.files.length; i++) {
+    imgArr.push(req.files[i].filename);
   }
+  product.findOneAndUpdate(
+    { _id: req.params.productId },
+    {
+      name: req.body.name,
+      unitPrice: req.body.unitPrice,
+      unitPromotionalPrice: req.body.unitPromotionalPrice,
+      images: req.files ? [...imgArr, ...req.body.images] : req.body.images,
+      description: req.body.description,
+      categories: req.body.categories,
+      suppliers: req.body.suppliers,
+    },
+    { new: true },
+    (err, product) => {
+      if (err) res.send(err);
+      res.json(product);
+    }
+  );
+  // if (req.files) {
+  //   product.findOneAndUpdate(
+  //     { _id: req.params.productId },
+  //     {
+  //       name: req.body.name,
+  //       unitPrice: req.body.unitPrice,
+  //       unitPromotionalPrice: req.body.unitPromotionalPrice,
+  //       images: [...imgArr, ...req.body.images],
+  //       description: req.body.description,
+  //       categories: req.body.categories,
+  //       suppliers: req.body.suppliers,
+  //     },
+  //     { new: true },
+  //     (err, product) => {
+  //       if (err) res.send(err);
+  //       res.json(product);
+  //     }
+  //   );
+  // } else {
+  //   product.findOneAndUpdate(
+  //     { _id: req.params.productId },
+  //     {
+  //       name: req.body.name,
+  //       unitPrice: req.body.unitPrice,
+  //       unitPromotionalPrice: req.body.unitPromotionalPrice,
+  //       description: req.body.description,
+  //       categories: req.body.categories,
+  //       suppliers: req.body.suppliers,
+  //     },
+  //     { new: true },
+  //     (err, product) => {
+  //       if (err) res.send(err);
+  //       res.json(product);
+  //     }
+  //   );
+  // }
 };
 
 exports.delete_a_product = (req, res) => {
@@ -519,3 +544,97 @@ exports.putFromExcel = (req, res) => {
     // x++;
   });
 };
+
+exports.getInfoProduct = (req, res) => { 
+  product.aggregate([
+    {
+      $match: { _id: mongoose.Types.ObjectId(req.params.id) },
+    },
+    {
+      $lookup: {
+        from: "productInfo",
+        localField: "_id",
+        foreignField: "productID",
+        as: "productInfo",
+      }
+    },
+    {
+      $unwind: "$productInfo",
+    },
+    {
+      $group: {
+        _id: {
+          ID: "$_id",
+          color: "$productInfo.color",
+        },
+        name: { $first: "$name" },
+        unitPrice: { $first: "$unitPrice" },
+        unitPromotionalPrice: { $first: "$unitPromotionalPrice" },
+        images: { $first: "$images" },
+        categories: { $first: "$categories" },
+        size: { $push: "$productInfo.size" },
+        description: { $first: "$description" },
+        quantity: { $push: "$productInfo.quantity" },        
+      }
+    },
+    {
+      $lookup: {
+        from: "productInfo",
+        localField: "_id.ID",
+        foreignField: "productID",
+        as: "productInfo",
+      }
+    },
+   
+    
+    // {
+    //   $group: {
+    //     _id: "$productInfo.size",
+    //   }
+    // }
+  ], (err, data) => { 
+    if (err) res.send(err);
+    res.json(data);
+  }).sort({ _id: 1 });
+}
+
+exports.getAllProductAndInfo = (req, res) => { 
+  product.aggregate([   
+    {
+      $lookup: {
+        from: "productInfo",
+        localField: "_id",
+        foreignField: "productID",
+        as: "productInfo",
+      }
+    },
+    {
+      $unwind: "$productInfo",
+    },
+    {
+      $group: {
+        _id: {
+          ID: "$_id",
+          color: "$productInfo.color",
+        },
+        name: { $first: "$name" },
+        unitPrice: { $first: "$unitPrice" },
+        unitPromotionalPrice: { $first: "$unitPromotionalPrice" },
+        images: { $first: "$images" },
+        categories: { $first: "$categories" },
+        size: { $push: "$productInfo.size" },
+      }
+    },
+    
+   
+    
+    // {
+    //   $group: {
+    //     _id: "$productInfo.size",
+    //   }
+    // }
+  ], (err, data) => { 
+    if (err) res.send(err);
+    res.json(data);
+  })
+}

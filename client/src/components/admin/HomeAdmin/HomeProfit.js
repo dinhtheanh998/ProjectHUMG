@@ -1,35 +1,73 @@
 import axios from "axios";
-import React, { useEffect, useRef } from "react";
-import CalcOrder from "./CalcOrder";
+import * as dateFns from "date-fns";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
+import React, { useEffect, useState } from "react";
+import { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { CustomProvider, DateRangePicker } from "rsuite";
+import "rsuite/dist/rsuite.css";
+import { nFormatter } from "../../../config/config";
 import myIcon from "../../iconAdmin";
-import { converCurences, nFormatter } from "../../../config/config";
-import { ChartProfit, ChartDonut } from "./ChartProfit";
-import { data, options, handleData } from "./ChartData";
-
-const labelsMonth = [
-  "Tháng 1",
-  "Tháng 2",
-  "Tháng 3",
-  "Tháng 4",
-  "Tháng 5",
-  "Tháng 6",
-  "Tháng 7",
-  "Tháng 8",
-  "Tháng 9",
-  "Tháng 10",
-  "Tháng 11",
-  "Tháng 12",
+import CalcOrder from "./CalcOrder";
+import { data, handleData, options } from "./ChartData";
+import { ChartDonut, ChartProfit } from "./ChartProfit";
+import "./Datepick.scss";
+import ListUser from "./ListUser";
+registerLocale("vi", vi);
+const Ranges = [
+  {
+    label: "Hôm nay",
+    value: [dateFns.startOfDay(new Date()), dateFns.endOfDay(new Date())],
+  },
+  {
+    label: "Hôm qua",
+    value: [
+      dateFns.startOfDay(dateFns.addDays(new Date(), -1)),
+      dateFns.endOfDay(dateFns.addDays(new Date(), -1)),
+    ],
+  },
+  {
+    label: "Tuần trước",
+    value: [
+      dateFns.startOfDay(dateFns.subDays(new Date(), 6)),
+      dateFns.endOfDay(new Date()),
+    ],
+  },
+  {
+    label: "30 ngày trước",
+    value: [
+      dateFns.startOfDay(dateFns.subDays(new Date(), 29)),
+      dateFns.endOfDay(new Date()),
+    ],
+  },
 ];
 
+const labelsMonth = [
+  "Thg 1",
+  "Thg 2",
+  "Thg 3",
+  "Thg 4",
+  "Thg 5",
+  "Thg 6",
+  "Thg 7",
+  "Thg 8",
+  "Thg 9",
+  "Thg 10",
+  "Thg 11",
+  "Thg 12",
+];
 
-const labelDays = [...Array(new Date().getDate()).keys()];
-console.log(labelDays);
 const HomeProfit = () => {
+  const [value, setValue] = React.useState(null);
+  // const [startDate, setStartDate] = useState(new Date());
+  // const [endDate, setEndDate] = useState(new Date());
+  const [dataChart, setDataChart] = useState([]);
+
   const [allQuantityPro, setAllQuantityPro] = React.useState();
   const [dataProfit, setDataProfit] = React.useState();
-  const [dataProfitPerMonth, setDataProfitPerMonth] = React.useState();
   const [dataProfitMonthy, setDataProfitMonthy] = React.useState();
-  const [indexShowChart, setIndexShowChart] = React.useState(1);
+  const [indexShowChart, setIndexShowChart] = React.useState(2);
   useEffect(() => {
     axios.get("/api/productsInfo/getTotalQuantity").then((res) => {
       setAllQuantityPro(res.data[0]);
@@ -37,14 +75,11 @@ const HomeProfit = () => {
     axios.get("/api/order/getProfitNowMonth").then((res) => {
       setDataProfit(res.data);
     });
-    axios.get("/api/order/getProfitPerMonth").then((res) => {
-      setDataProfitPerMonth(res.data);
-    });
+
     axios.get("/api/order/getProfitMonthly").then((res) => {
       setDataProfitMonthy(res.data);
     });
   }, []);
-
   const coutOrder = (state, data) => {
     if (data) {
       const count = data.filter((item) => item._id === state);
@@ -60,12 +95,58 @@ const HomeProfit = () => {
   const profitNowMonth = getProfitNowMonth(dataProfit);
 
   const newXData = handleData(dataProfitMonthy, labelsMonth);
-  const daysDataProfit = handleData(dataProfitPerMonth, labelDays);
-
   const countWait = coutOrder("Chờ xác nhận", dataProfit);
   const countAccept = coutOrder("Đã xác nhận", dataProfit);
   const countComplete = coutOrder("Thành công", dataProfit);
   const countCancel = coutOrder("Đã hủy", dataProfit);
+
+  const Calendar = {
+    sunday: "CN",
+    monday: "Th2",
+    tuesday: "Th3",
+    wednesday: "Th4",
+    thursday: "Th5",
+    friday: "Th6",
+    saturday: "Th7",
+    ok: "OK",
+    formattedMonthPattern: "MMM yyyy",
+    formattedDayPattern: "dd MMM yyyy",
+    dateLocale: vi,
+  };
+
+  const locale = {
+    Calendar,
+    Ranges,
+    DatePicker: {
+      ...Calendar,
+    },
+    DateRangePicker: {
+      ...Calendar,
+    },
+  };
+  // value.forEach(item => {
+  //   // console.log(dateFns.parseISO('2022-08-19T18:05:22.286+00:00'))
+  //   console.log(dateFns.formatISO(item));
+  // })
+  const handleChangeDateRange = (value) => {
+    if (value === null) {
+      setValue(null);
+      setIndexShowChart(2)
+      return;
+    }
+    let startDate = dateFns.formatISO(value[0]);
+    let endDate = dateFns.formatISO(value[1]);
+    setValue(value);
+    setIndexShowChart(1)
+    axios
+      .get(
+        `/api/order/v1/getOrderbyDateRange/startDate=${startDate}&endDate=${endDate}`
+      )
+      .then((res) => {
+        setDataChart(res.data);
+      });
+  };
+  console.log(dataChart);
   return (
     <>
       <div className="py-10 bg-blue-300">
@@ -113,78 +194,83 @@ const HomeProfit = () => {
           ></CalcOrder>
         </div>
       </div>
-      {dataProfitPerMonth && (
-        <div className="flex mt-5">
-          <div className="w-full p-5  bg-white rounded-lg shadow-md w-[70%]">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-xl font-semibold">Biểu đồ</span>
-              </div>
-              <div className="flex gap-x-3">
-                <span
-                  className={`px-4 py-2  border border-gray-300 rounded-lg cursor-pointer ${
-                    indexShowChart === 1 ? "bg-blue-500 text-white" : ""
-                  }`}
-                  onClick={() => {
-                    setIndexShowChart(1);
-                  }}
-                >
-                  Ngày
-                </span>
-                <span
-                  className={`px-4 py-2  border border-gray-300 rounded-lg cursor-pointer ${
-                    indexShowChart === 2 ? "bg-blue-500 text-white" : ""
-                  }`}
-                  onClick={() => {
-                    setIndexShowChart(2);
-                  }}
-                >
-                  Tháng
-                </span>               
-              </div>
+      <div className="flex mt-5">
+        <div className="w-full p-5  bg-white rounded-lg shadow-md w-[70%]">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-xl font-semibold">Biểu đồ</span>
             </div>
-            {indexShowChart === 1 && (
-              <ChartProfit
-                options={options("Doanh Thu theo ngày")}
-                data={data(
-                  daysDataProfit,
-                  labelDays.map((item) => item + 1)
-                )}
-              ></ChartProfit>
-            )}
-            {indexShowChart === 2 && (
-              <ChartProfit
-                options={options("Doanh thu theo tháng")}
-                data={data(newXData, labelsMonth)}
-              ></ChartProfit>
-            )}
+            <div className="flex gap-x-3">
+              <span
+                className={`px-4 py-1  border border-gray-300 rounded-lg cursor-pointer flex items-center ${
+                  indexShowChart === 2 ? "bg-blue-500 text-white" : ""
+                }`}
+                onClick={() => {
+                  setIndexShowChart(2);
+                  setValue(null);
+                }}
+              >
+                Tháng
+              </span>
+              <CustomProvider locale={locale}>
+                <DateRangePicker
+                  value={value}
+                  onChange={handleChangeDateRange}
+                  ranges={Ranges}
+                  placeholder="Chọn ngày"
+                />
+              </CustomProvider>
+            </div>
           </div>
-          <div className="flex items-center ml-5 bg-white rounded-lg shadow-md rouned-lg">
-            <ChartDonut
-              data={{
-                labels: ["Chờ xử lý", "Đã xác nhận", "Thành công", "Đã hủy"],
-                datasets: [
-                  {
-                    label: "# of Votes",
-                    data: [countWait, countAccept, countComplete, countCancel],
-                    backgroundColor: [
-                      "#FEC260",
-                      "#009688",
-                      "#4caf50",
-                      "#e91e63",
-                    ],
-                    borderColor: [
-                      "#ccc"
-                    ],
-                    borderWidth: 1,
-                    cutout: "70%",
-                  },
-                ],
-              }}
-            ></ChartDonut>
-          </div>        
+          {indexShowChart === 2 && (
+            <ChartProfit
+              options={options("Doanh thu theo tháng")}
+              data={data(newXData, labelsMonth, 0.4)}
+            ></ChartProfit>
+          )}
+          {indexShowChart === 1 && (
+            <ChartProfit
+              options={options("Doanh thu")}
+              data={data(
+                dataChart.map((item) => {
+                  return item.total;
+                }),
+                dataChart.map((item) => {
+                  return item._id;
+                }),
+                0.4
+              )}
+            ></ChartProfit>
+          )}
         </div>
-      )}
+        <div className="flex items-center ml-5 bg-white rounded-lg shadow-md rouned-lg">
+          <ChartDonut
+            data={{
+              labels: ["Chờ xử lý", "Đã xác nhận", "Thành công", "Đã hủy"],
+              datasets: [
+                {
+                  label: "# of Votes",
+                  data: [countWait, countAccept, countComplete, countCancel],
+                  backgroundColor: ["#FEC260", "#009688", "#4caf50", "#e91e63"],
+                  borderColor: ["#ccc"],
+                  borderWidth: 1,
+                  cutout: "70%",
+                },
+              ],
+            }}
+          ></ChartDonut>
+        </div>
+      </div>
+      <div className="mt-5 bg-white rounded-lg">
+        <div className="flex items-center px-4 pt-2 text-base font-semibold border-b border-gray-300">
+          <span className="w-[25%]">Thông tin</span>
+          <span className="w-[25%]">Email</span>
+          <span className="w-[15%]">Ngày tạo</span>
+          <span className="w-[15%] text-center">Số đơn đã đặt</span>
+          <span className="w-[20%] text-center">Role</span>
+        </div>
+        <ListUser></ListUser>
+      </div>      
     </>
   );
 };

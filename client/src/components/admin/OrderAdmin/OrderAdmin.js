@@ -6,7 +6,8 @@ import axios from "axios";
 import DropDownHook from "../../customForm/DropDownHook";
 import { useWatch, useForm } from "react-hook-form";
 import DropDownCustomOrder from "../../customForm/DropdownCustomOrder";
-import { converCurences } from "../../../config/config";
+import { converCurences, getSearchResultPage } from "../../../config/config";
+import OrderPagination from "./OrderPagination";
 
 const stateOrder = [
   {
@@ -36,14 +37,19 @@ const stateOrder = [
 ];
 
 const OrderAdmin = () => {
+  let numPages = 0;
+  let newDataOrder = [];
+  const [curPage, setCurPage] = React.useState(1);
   const [dataOrder, setDataOrder] = React.useState([]);
   const [showDetails, setShowDetails] = React.useState([]);
-  const [searchData, setSearchData] = React.useState("");
+  const [searchData, setSearchData] = React.useState();
   const { register, handleSubmit, control, watch, setValue, getValues } =
     useForm();
-  // const stateWatch = watch("state")
-  // const value = getValues("data");
-  // console.log(value);
+  if (dataOrder.length > 0) {
+    numPages = Math.ceil(dataOrder.length / 10);
+    newDataOrder = getSearchResultPage(curPage, dataOrder);
+  }
+  // console.log(newDataOrder);
   useEffect(() => {
     axios
       .get("/api/order")
@@ -79,10 +85,10 @@ const OrderAdmin = () => {
     }
     debounceDropDown(e.target.value);
   };
-  
+
   return (
     <BottomBodyAdm>
-      <div className=" z-[99] py-4 top-5 ">
+      <div className=" z-[99] pt-4 top-5 ">
         <div className="relative flex items-center ">
           <label htmlFor="simple-search" className="sr-only">
             Search
@@ -141,241 +147,252 @@ const OrderAdmin = () => {
           </div>
         </span>
       </div>
-      <div>
-      {!searchData &&
-        dataOrder &&
-        dataOrder.length > 0 &&
-        dataOrder.map((item, index) => {
-          return (
-            <>
-            <form
-              onSubmit={handleSubmit(handleOnSubmit)}
-              className="relative grid items-center grid-cols-10 p-3 mb-4 bg-white rounded-xl"
-              key={uuidv4()}
-            >
-              {item.paymentMethods === "Internet Banking" && (
-                <div className="absolute px-2 font-semibold text-white bg-teal-600 shadow-md bottom-1 -left-[6px] infopayment--bk">
-                  Banking
-                </div>
-              )}
-              {item.paymentMethods === "Ship COD" && (
-                <div className="absolute px-2 font-semibold text-white bg-orange-300 shadow-md bottom-1 -left-[6px] infopayment--cod">
-                  COD
-                </div>
-              )}
-              <div className="col-span-1">
-                <span className="font-semibold">{item.fullName}</span>
-              </div>
-              <span className="col-span-2">
-                <span className="text-sm font-semibold">{item.email}</span>
-              </span>
-              <span className="col-span-2 ml-3 font-semibold">
-                {item.address}
-              </span>
-              <div className="col-span-3 mx-3">
-                <div className="grid grid-cols-2">
-                  <span className="">
-                    <span className="mx-3 font-semibold">{item.phone}</span>
+      <div className="orderList">
+        {!searchData &&
+          newDataOrder &&
+          newDataOrder.length > 0 &&
+          newDataOrder.map((item, index) => {
+            return (
+              <React.Fragment key={uuidv4()}>
+                <form
+                  onSubmit={handleSubmit(handleOnSubmit)}
+                  className={`relative grid items-center grid-cols-10 p-3 mt-4 bg-white rounded-xl first:mt-0 ${
+                    item.state === "Đã hủy"
+                      ? "opacity-40 select-none read-only"
+                      : ""
+                  }`}
+                  key={uuidv4()}
+                >
+                  {item.paymentMethods === "Internet Banking" && (
+                    <div className="absolute px-2 font-semibold text-white bg-teal-600 shadow-md bottom-1 -left-[6px] infopayment--bk">
+                      Banking
+                    </div>
+                  )}
+                  {item.paymentMethods === "Ship COD" && (
+                    <div className="absolute px-2 font-semibold text-white bg-orange-300 shadow-md bottom-1 -left-[6px] infopayment--cod">
+                      COD
+                    </div>
+                  )}
+                  <div className="col-span-1">
+                    <span className="font-semibold">{item.fullName}</span>
+                  </div>
+                  <span className="col-span-2">
+                    <span className="text-sm font-semibold">{item.email}</span>
                   </span>
-                  <div className="mx-3 font-semibold text-red-400">
-                    {converCurences(item.total)}đ
-                  </div>
-                </div>
-              </div>
-              <div className="col-span-2 mx-3 font-semibold ">
-                <div className="relative flex items-center">
-                  <span className="w-[70%]">
-                    <DropDownCustomOrder
-                      control={control}
-                      name="state"
-                      data={stateOrder}
-                      dropDownLabel={item.state}
-                      setValue={setValue}
-                      item={item}
-                    ></DropDownCustomOrder>
+                  <span className="col-span-2 ml-3 font-semibold">
+                    {item.address}
                   </span>
-                  <div
-                    className="absolute -right-0"
-                    onClick={() => {
-                      handleShowDetails(index);
-                    }}
-                  >
-                    <span className="py-2 px-4 bg-[#f7f7f7] border  border-gray-50 rounded-lg font-semibold hover:bg-black hover:text-white transition-all cursor-pointer float-right min-w-[64px]">
-                      {showDetails.includes(index) ? "Ẩn" : "Xem"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* /////////////////// */}
-
-              <div
-                className={`col-span-10 transition-all border-t border-gray-300 mt-3 ${
-                  showDetails.includes(index)
-                    ? "h-[auto] opacity-100 visible"
-                    : "h-[0] opacity-0 invisible"
-                }`}
-              >
-                <div className="grid grid-cols-10 pt-2">
-                  <div className="flex items-center col-span-3 gap-x-3">
-                    Sản phẩm
-                  </div>
-                  <div className="">Màu</div>
-                  <div className="">Giá</div>
-                  <div className="">Số lượng</div>
-                  <div className="">Size</div>
-                </div>
-                {item.details.map((itemDetail) => {
-                  return (
-                    <div className="col-span-10 mb-3" key={uuidv4()}>
-                      <div className="grid items-center grid-cols-10">
-                        <div className="flex items-center col-span-3 gap-x-3">
-                          <img
-                            src={`/images/${itemDetail.images}`}
-                            alt=""
-                            className="w-[50px] h-[50px] object-cover rounded-lg"
-                          />
-                          <span className="col-span-1">{itemDetail.name}</span>
-                        </div>
-                        <div className="">
-                          <span
-                            className="px-6 py-1 rounded-lg"
-                            style={{
-                              backgroundColor: `${itemDetail.color}`,
-                            }}
-                          ></span>
-                        </div>
-                        <div className="">
-                          {itemDetail.unitPromotionalPrice}
-                        </div>
-                        <div className="">{itemDetail.quantity}</div>
-                        <div className="">{itemDetail.size}</div>
+                  <div className="col-span-3 mx-3">
+                    <div className="grid grid-cols-2">
+                      <span className="">
+                        <span className="mx-3 font-semibold">{item.phone}</span>
+                      </span>
+                      <div className="mx-3 font-semibold text-red-400">
+                        {converCurences(item.total)}đ
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-              </form>              
-            </>
-              
-          );
-        })}
+                  </div>
+                  <div className="col-span-2 mx-3 font-semibold ">
+                    <div className="relative flex items-center">
+                      <span className="w-[70%]">
+                        <DropDownCustomOrder
+                          control={control}
+                          name="state"
+                          data={stateOrder}
+                          dropDownLabel={item.state}
+                          setValue={setValue}
+                          item={item}
+                        ></DropDownCustomOrder>
+                      </span>
+                      <div
+                        className="absolute -right-0"
+                        onClick={() => {
+                          handleShowDetails(index);
+                        }}
+                      >
+                        <span className="py-2 px-4 bg-[#f7f7f7] border  border-gray-50 rounded-lg font-semibold hover:bg-black hover:text-white transition-all cursor-pointer float-right min-w-[64px]">
+                          {showDetails.includes(index) ? "Ẩn" : "Xem"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* /////////////////// */}
+
+                  <div
+                    className={`col-span-10 transition-all border-t border-gray-300 mt-3 ${
+                      showDetails.includes(index)
+                        ? "h-[auto] opacity-100 visible"
+                        : "h-[0] opacity-0 invisible"
+                    }`}
+                  >
+                    <div className="grid grid-cols-10 pt-2">
+                      <div className="flex items-center col-span-3 gap-x-3">
+                        Sản phẩm
+                      </div>
+                      <div className="">Màu</div>
+                      <div className="">Giá</div>
+                      <div className="">Số lượng</div>
+                      <div className="">Size</div>
+                    </div>
+                    {item.details.map((itemDetail) => {
+                      return (
+                        <div className="col-span-10 mb-3" key={uuidv4()}>
+                          <div className="grid items-center grid-cols-10">
+                            <div className="flex items-center col-span-3 gap-x-3">
+                              <img
+                                src={`/images/${itemDetail.images}`}
+                                alt=""
+                                className="w-[50px] h-[50px] object-cover rounded-lg"
+                              />
+                              <span className="col-span-1">
+                                {itemDetail.name}
+                              </span>
+                            </div>
+                            <div className="">
+                              <span
+                                className="px-6 py-1 rounded-lg"
+                                style={{
+                                  backgroundColor: `${itemDetail.color}`,
+                                }}
+                              ></span>
+                            </div>
+                            <div className="">
+                              {itemDetail.unitPromotionalPrice}
+                            </div>
+                            <div className="">{itemDetail.quantity}</div>
+                            <div className="">{itemDetail.size}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </form>
+              </React.Fragment>
+            );
+          })}
+        {searchData &&
+          searchData?.length > 0 &&
+          searchData?.map((item, index) => {
+            return (
+              <form
+                onSubmit={handleSubmit(handleOnSubmit)}
+                className="relative grid items-center grid-cols-10 p-3 mb-2 bg-white rounded-xl"
+                key={uuidv4()}
+              >
+                {item.paymentMethods === "Internet Banking" && (
+                  <div className="absolute px-2 font-semibold text-white bg-teal-600 shadow-md bottom-1 -left-[6px] infopayment--bk">
+                    Banking
+                  </div>
+                )}
+                {item.paymentMethods === "Ship COD" && (
+                  <div className="absolute px-2 font-semibold text-white bg-orange-300 shadow-md bottom-1 -left-[6px] infopayment--cod">
+                    COD
+                  </div>
+                )}
+                <div className="col-span-1">
+                  <span className="font-semibold">{item.fullName}</span>
+                </div>
+                <span className="col-span-2">
+                  <span className="text-sm font-semibold">{item.email}</span>
+                </span>
+                <span className="col-span-2 ml-3 font-semibold">
+                  {item.address}
+                </span>
+                <div className="col-span-3 mx-3">
+                  <div className="grid grid-cols-2">
+                    <span className="">
+                      <span className="mx-3 font-semibold">{item.phone}</span>
+                    </span>
+                    <div className="mx-3 font-semibold text-red-400">
+                      {converCurences(item.total)}đ
+                    </div>
+                  </div>
+                </div>
+                <div className="col-span-2 mx-3 font-semibold ">
+                  <div className="relative flex items-center">
+                    <span className="w-[70%]">
+                      <DropDownCustomOrder
+                        control={control}
+                        name="state"
+                        data={stateOrder}
+                        dropDownLabel={item.state}
+                        setValue={setValue}
+                        item={item}
+                      ></DropDownCustomOrder>
+                    </span>
+                    <div
+                      className="absolute -right-0"
+                      onClick={() => {
+                        handleShowDetails(index);
+                      }}
+                    >
+                      <span className="py-2 px-4 bg-[#f7f7f7] border  border-gray-50 rounded-lg font-semibold hover:bg-black hover:text-white transition-all cursor-pointer float-right min-w-[64px]">
+                        {showDetails.includes(index) ? "Ẩn" : "Xem"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* /////////////////// */}
+
+                <div
+                  className={`col-span-10 transition-all border-t border-gray-300 mt-3 ${
+                    showDetails.includes(index)
+                      ? "h-[auto] opacity-100 visible"
+                      : "h-[0] opacity-0 invisible"
+                  }`}
+                >
+                  <div className="grid grid-cols-10 pt-2">
+                    <div className="flex items-center col-span-3 gap-x-3">
+                      Sản phẩm
+                    </div>
+                    <div className="">Màu</div>
+                    <div className="">Giá</div>
+                    <div className="">Số lượng</div>
+                    <div className="">Size</div>
+                  </div>
+                  {item.details.map((itemDetail) => {
+                    return (
+                      <div className="col-span-10 mb-3" key={uuidv4()}>
+                        <div className="grid items-center grid-cols-10">
+                          <div className="flex items-center col-span-3 gap-x-3">
+                            <img
+                              src={`/images/${itemDetail.images}`}
+                              alt=""
+                              className="w-[50px] h-[50px] object-cover rounded-lg"
+                            />
+                            <span className="col-span-1">
+                              {itemDetail.name}
+                            </span>
+                          </div>
+                          <div className="">
+                            <span
+                              className="px-6 py-1 rounded-lg"
+                              style={{
+                                backgroundColor: `${itemDetail.color}`,
+                              }}
+                            ></span>
+                          </div>
+                          <div className="">
+                            {itemDetail.unitPromotionalPrice}
+                          </div>
+                          <div className="">{itemDetail.quantity}</div>
+                          <div className="">{itemDetail.size}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </form>
+            );
+          })}
+        <OrderPagination
+          curPage={curPage}
+          setCurPage={setCurPage}
+          numPages={numPages}
+        ></OrderPagination>
       </div>
-
-      {searchData &&
-        searchData.length > 0 &&
-        searchData.map((item, index) => {
-          return (
-            <form
-              onSubmit={handleSubmit(handleOnSubmit)}
-              className="relative grid items-center grid-cols-10 p-3 mb-2 bg-white rounded-xl"
-              key={uuidv4()}
-            >
-              {item.paymentMethods === "Internet Banking" && (
-                <div className="absolute px-2 font-semibold text-white bg-teal-600 shadow-md bottom-1 -left-[6px] infopayment--bk">
-                  Banking
-                </div>
-              )}
-              {item.paymentMethods === "Ship COD" && (
-                <div className="absolute px-2 font-semibold text-white bg-orange-300 shadow-md bottom-1 -left-[6px] infopayment--cod">
-                  COD
-                </div>
-              )}
-              <div className="col-span-1">
-                <span className="font-semibold">{item.fullName}</span>
-              </div>
-              <span className="col-span-2">
-                <span className="text-sm font-semibold">{item.email}</span>
-              </span>
-              <span className="col-span-2 ml-3 font-semibold">
-                {item.address}
-              </span>
-              <div className="col-span-3 mx-3">
-                <div className="grid grid-cols-2">
-                  <span className="">
-                    <span className="mx-3 font-semibold">{item.phone}</span>
-                  </span>
-                  <div className="mx-3 font-semibold text-red-400">
-                    {converCurences(item.total)}đ
-                  </div>
-                </div>
-              </div>
-              <div className="col-span-2 mx-3 font-semibold ">
-                <div className="relative flex items-center">
-                  <span className="w-[70%]">
-                    <DropDownCustomOrder
-                      control={control}
-                      name="state"
-                      data={stateOrder}
-                      dropDownLabel={item.state}
-                      setValue={setValue}
-                      item={item}
-                    ></DropDownCustomOrder>
-                  </span>
-                  <div
-                    className="absolute -right-0"
-                    onClick={() => {
-                      handleShowDetails(index);
-                    }}
-                  >
-                    <span className="py-2 px-4 bg-[#f7f7f7] border  border-gray-50 rounded-lg font-semibold hover:bg-black hover:text-white transition-all cursor-pointer float-right min-w-[64px]">
-                      {showDetails.includes(index) ? "Ẩn" : "Xem"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* /////////////////// */}
-
-              <div
-                className={`col-span-10 transition-all border-t border-gray-300 mt-3 ${
-                  showDetails.includes(index)
-                    ? "h-[auto] opacity-100 visible"
-                    : "h-[0] opacity-0 invisible"
-                }`}
-              >
-                <div className="grid grid-cols-10 pt-2">
-                  <div className="flex items-center col-span-3 gap-x-3">
-                    Sản phẩm
-                  </div>
-                  <div className="">Màu</div>
-                  <div className="">Giá</div>
-                  <div className="">Số lượng</div>
-                  <div className="">Size</div>
-                </div>
-                {item.details.map((itemDetail) => {
-                  return (
-                    <div className="col-span-10 mb-3" key={uuidv4()}>
-                      <div className="grid items-center grid-cols-10">
-                        <div className="flex items-center col-span-3 gap-x-3">
-                          <img
-                            src={`/images/${itemDetail.images}`}
-                            alt=""
-                            className="w-[50px] h-[50px] object-cover rounded-lg"
-                          />
-                          <span className="col-span-1">{itemDetail.name}</span>
-                        </div>
-                        <div className="">
-                          <span
-                            className="px-6 py-1 rounded-lg"
-                            style={{
-                              backgroundColor: `${itemDetail.color}`,
-                            }}
-                          ></span>
-                        </div>
-                        <div className="">
-                          {itemDetail.unitPromotionalPrice}
-                        </div>
-                        <div className="">{itemDetail.quantity}</div>
-                        <div className="">{itemDetail.size}</div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </form>
-          );
-        })}
     </BottomBodyAdm>
   );
 };
