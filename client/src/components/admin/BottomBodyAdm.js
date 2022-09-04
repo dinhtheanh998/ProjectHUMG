@@ -2,7 +2,7 @@ import React from 'react';
 
 const BottomBodyAdm = ({children}) => {
     return (
-        <div className="mx-8 max-h-[100vh] overflow-auto ">
+        <div className="min-h-screen mx-8">
             {children}
         </div>
     );

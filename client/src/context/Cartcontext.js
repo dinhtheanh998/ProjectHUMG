@@ -164,6 +164,9 @@ const CartProvider = (props) => {
     }, 0);
   };
 
+  
+
+
   const clearCart = () => { 
     setValueCart([]);
     setCartItems([]);

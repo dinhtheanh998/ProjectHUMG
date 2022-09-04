@@ -52,7 +52,7 @@ const userController = {
     }
   },
   updateUser: async (req, res) => {
-    console.log(req.params)
+    console.log(req.params);
     try {
       if (req.file && req.body.password) {
         console.log("Update avatar & password");
@@ -60,7 +60,13 @@ const userController = {
         const hashed = await bcrypt.hash(req.body.password, salt);
         User.findByIdAndUpdate(
           req.params.userId,
-          {$set: {avatar: req.file.filename, email: req.body.email,password: hashed}},
+          {
+            $set: {
+              avatar: req.file.filename,
+              email: req.body.email,
+              password: hashed,
+            },
+          },
           (err, user) => {
             if (err) res.send(err);
             res.json(user);
@@ -72,7 +78,7 @@ const userController = {
         console.log(req.file.filename);
         User.findByIdAndUpdate(
           req.params.userId,
-          {$set: {avatar: req.file.filename, email: req.body.email}},
+          { $set: { avatar: req.file.filename, email: req.body.email } },
           (err, user) => {
             if (err) res.send(err);
             res.json(user);
@@ -85,7 +91,7 @@ const userController = {
         console.log("Update password");
         User.findByIdAndUpdate(
           req.params.userId,
-          {$set: {password: hashed, email: req.body.email}},          
+          { $set: { password: hashed, email: req.body.email } },
           (err, user) => {
             if (err) res.send(err);
             res.json(user);
@@ -97,6 +103,94 @@ const userController = {
       res.status(500).json(err);
     }
   },
+  getAllUserAndOrder: async (req, res) => {
+    console.log("User and order");
+    try {
+      const user = await User.aggregate([
+        // {
+        //   $project: {
+        //     _id: 1,
+        //     username: 1,
+        //     email: 1,
+        //     isAdmin: 1,
+        //     avatar: 1,
+        //     createdAt: 1,
+        //   },
+        // },
+        {
+          $lookup: {
+            from: "orders",
+            localField: "username",
+            foreignField: "userName",
+            as: "orders",
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            username: 1,
+            email: 1,
+            isAdmin: 1,
+            avatar: 1,
+            createdAt: 1,
+            countOrder: {
+              $filter: {
+                input: "$orders",
+                as: "order",
+                cond: { $eq: ["$$order.state", "Thành công"] },
+              },
+            },            
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            username: 1,
+            email: 1,
+            isAdmin: 1,
+            avatar: 1,
+            createdAt: 1,
+            countOrder: { $size: "$countOrder" },
+          }
+        },
+        {$limit:4}
+      ]).sort({ countOrder: -1 });
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(500).json(err);
+    }
+  },
+  updateUserFromAdmin: async (req, res) => { 
+    try {
+      if (req.body.password) {
+        console.log("Update password");
+        const salt = await bcrypt.genSalt(10);
+        const hashed = await bcrypt.hash(req.body.password, salt);
+        User.findByIdAndUpdate(
+          req.params.userId,
+          { $set: { password: hashed, isAdmin: req.body.isAdmin } },
+          (err, user) => {
+            if (err) res.send(err);
+            res.json(user);
+          }
+        );
+        return;
+      } else {
+        console.log("Update isAdmin");
+        User.findByIdAndUpdate(
+          req.params.userId,
+          { $set: {isAdmin: req.body.isAdmin } },
+          (err, user) => {
+            if (err) res.send(err);
+            res.json(user);
+          }
+        );
+        return;
+      }
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  }
 };
 
 module.exports = userController;

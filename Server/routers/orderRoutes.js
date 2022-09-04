@@ -19,4 +19,9 @@ router.get('/getOrderByState/?state=:state', orderBuilder.getOrderByState)
 router.get('/test/testQuery/:id', orderBuilder.getPriceByTime)
 // lấy đơn hàng theo tài khoản
 router.get('/v1/getOrderbyUser/:id', orderBuilder.getOrderbyUser)
+// lấy đơn hàng theo ngày đã chọn
+router.get('/v1/getOrderbyDate/?day=:day&?month=:month&?year=:year', orderBuilder.getProfitBySelectDay)
+// lấy đơn hàng giữa 2 ngày đã chọn
+router.get('/v1/getOrderbyDateRange/?startDate=:startDate&?endDate=:endDate', orderBuilder.getOrderByDateRange)
+
 module.exports = router

@@ -33,6 +33,7 @@ const Header = ({ user, handleLogout }) => {
   const { cartItems, calcQuantity } = useCart();
   const [loginShow, setLoginShow] = useState(false);
   const [registerShow, setRegisterShow] = useState(false);
+  const navigate = useNavigate()
   // const countCartItems = cartItems.reduce((acc, item) => {
   //   return acc + item.quantity;
   // }, 0);
@@ -146,7 +147,9 @@ const Header = ({ user, handleLogout }) => {
         </div>
       </div>
       <nav className="flex items-center justify-between  my-5 shadow-sm menu page-container h-[70px]">
-        <div className="flex items-center h-full cursor-pointer select-none">
+        <div className="flex items-center h-full px-4 cursor-pointer select-none" onClick={() => {
+          navigate("/");
+        }}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="w-8 h-8"

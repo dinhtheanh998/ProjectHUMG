@@ -85,4 +85,10 @@ export const notifySuccess = (message) =>
   export const convertDate = (date) => {
     let newDate = new Date(date);
     return newDate.toLocaleString('vi');
-  }
+}
+  
+export const getSearchResultPage = function (page, arr) {
+  const start = (page - 1) * 10;
+  const end = page * 10;
+  return arr.slice(start, end);
+};

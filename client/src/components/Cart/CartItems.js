@@ -1,5 +1,6 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 import { converCurences, notifyWarn } from "../../config/config";
 import DropDownHook from "../customForm/DropDownHook";
 
@@ -7,6 +8,7 @@ const CartItems = ({
   data,
   size,
   color,
+  info,
   removeToCart,
   control,
   index,
@@ -22,19 +24,16 @@ const CartItems = ({
 }) => {
   const [quantity, setQuantity] = useState(data.quantity);
   const [maxQuantity, setMaxQuantity] = useState();
-
-  useEffect(() => {
-    const id = data._id;
-    const color = data.color.slice(1);
-    const size = data.size;
-    axios
-      .get(`/api/productsInfo/product=${id}&size=${size}&color=${color}`)
-      .then((res) => {
-        setMaxQuantity(res.data);
-      });
-  }, [quantity, data, maxQuantity, cartItems]);
+  const [loading, setLoading] = useState(true);
+  const quantityRef = useRef();
+  const navigate = useNavigate();
+  const checkMaxQuantity = (cartItems, index) =>
+    cartItems[index].productInfo.find(
+      (item) =>
+        item.size === cartItems[index].size &&
+        item.color === cartItems[index].color
+    ).quantity;
   const handleClickSize = async (index, e, cartItems) => {
-    console.log(cartItems[index], e.target.dataset.value);
     const info = await axios.get(
       `/api/productsInfo/checkProductQuantity/id=${
         cartItems[index]._id
@@ -55,7 +54,6 @@ const CartItems = ({
     }
   };
   const handleClickColor = async (index, e, cartItems) => {
-    console.log(cartItems[index], e.target.dataset.value);
     const info = await axios.get(
       `/api/productsInfo/checkProductQuantity/id=${
         cartItems[index]._id
@@ -75,45 +73,56 @@ const CartItems = ({
       setReload(!reload);
     }
   };
-
   // const handleInputQuantityChange = (index, cartItems, e) => {
   //   setQuantity(+e.target.value);
 
   // };
   // console.log(quantity);
+  // console.log(maxQuantity);
+  console.log(loading);
   return (
     <>
-      <div className="relative flex gap-3 mb-3">
-        <div className="w-[138px] rounded-lg flex-1">
+      <div className="relative flex gap-3 h-[186px] mb-8">
+        <div className="w-[138px] rounded-lg flex-1 border border-gray-300 shadow-sm">          
           <img
-            src={`/images/${data.images}`}
+            src={`/images/${data.images[0]}`}
             alt=""
-            className="object-cover w-full h-full transition-all rounded-lg hover:opacity-50"
+            className="object-cover w-full h-full transition-all rounded-lg hover:opacity-50"            
+            
           />
         </div>
         <div className="flex-[3]">
           <div className="flex flex-wrap h-full">
-            <span className="w-full text-xl font-semibold">{data.name}</span>
+            <span
+              className="w-full text-xl font-semibold cursor-pointer"
+              onClick={() => {
+                navigate(`/san-pham/${data._id}`);
+              }}
+            >
+              {data.name}
+            </span>
             <div className="w-full mt-auto mb-8 wrap-info-product">
               <div className="flex gap-x-5">
                 <DropDownHook
                   control={control}
-                  data={size}
+                  data={info?.size}
                   name="size"
                   setValue={setValue}
                   dropDownLabel={data.size}
                   option="size"
+                  optionshow={true}
                   handleClickSize={(e) => {
                     handleClickSize(index, e, cartItems);
                   }}
                 ></DropDownHook>
                 <DropDownHook
                   control={control}
-                  data={color}
+                  data={info?.color}
                   name="color"
                   setValue={setValue}
                   dropDownLabel={data.color}
                   option="color"
+                  optionshow={false}
                   handleClickColor={(e) => {
                     handleClickColor(index, e, cartItems);
                   }}
@@ -126,7 +135,6 @@ const CartItems = ({
                     aria-label="Decrement value"
                     className="w-[25px] flex items-center justify-center"
                     onClick={(e) => {
-                      console.log(maxQuantity);
                       updateQuantityDecrement(index, cartItems, maxQuantity);
                     }}
                   >
@@ -145,18 +153,20 @@ const CartItems = ({
                   </button>
                   <input
                     onChange={(e) => {
+                      const maxQ = checkMaxQuantity(cartItems, index);
                       setQuantity(+e.target.value);
-                      if (+e.target.value > maxQuantity) {
-                        setQuantity(maxQuantity);
+                      if (+e.target.value > maxQ) {
+                        setQuantity(maxQ);
                       }
                     }}
                     onBlur={(e) => {
+                      const maxQ = checkMaxQuantity(cartItems, index);
                       handleQuantityChange(index, cartItems, e.target.value);
-                      if (e.target.value > maxQuantity) {
-                        setQuantity(maxQuantity);
+                      if (e.target.value > maxQ) {
+                        setQuantity(maxQ);
                       }
-                      console.log(+e.target.value, maxQuantity);
                     }}
+                    ref={quantityRef}
                     // value={data.quantity}
                     value={quantity}
                     data-value={quantity}
@@ -167,7 +177,13 @@ const CartItems = ({
                     type="button"
                     className="w-[25px] flex items-center justify-center"
                     onClick={(e) => {
-                      updateQuantityIncrement(index, cartItems, maxQuantity);
+                      const maxQ = checkMaxQuantity(cartItems, index);
+                      updateQuantityIncrement(index, cartItems, maxQ);
+                      console.log(quantity, maxQ);
+                      if (quantityRef.current.value >= maxQ) {
+                        console.log("a");
+                        setQuantity(maxQ);
+                      }
                     }}
                   >
                     <svg

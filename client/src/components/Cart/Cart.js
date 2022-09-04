@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { useCart } from "../../context/Cartcontext";
-import DropDownHook from "../customForm/DropDownHook";
-import { set, useForm } from "react-hook-form";
-import axios from "axios";
-import InputForm from "../customForm/InputForm";
-import { converCurences } from "../../config/config";
-import CartItems from "./CartItems";
 import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
+import * as yup from "yup";
+import { converCurences } from "../../config/config";
+import { useCart } from "../../context/Cartcontext";
+import InputForm from "../customForm/InputForm";
+import CartItems from "./CartItems";
+import { v4 as uuidv4 } from "uuid";
+import SkeletonCartItem from "./SkeletonCartItem";
 
 const schema = yup.object().shape({
   fullName: yup.string().required("Họ vàn tên không được để trống"),
@@ -42,10 +43,12 @@ const Cart = () => {
     handleQuantityChange,
     clearCart,
   } = useCart();
+  const [info, setInfo] = useState();
   const [infoSize, setInfoSize] = useState();
   const [infoColor, setInfoColor] = useState();
   const [submitData, setSubmitData] = useState();
   const [reload, setReload] = useState(false);
+  const [loading, setLoading] = useState(true);
   const user = useSelector((state) => state.auth.login.currentUser);
   const {
     control,
@@ -66,21 +69,75 @@ const Cart = () => {
   }, []);
 
   useEffect(() => {
+    setLoading(true);
+    let unmounted = false;
+    let source = axios.CancelToken.source();
+    /*
+    .then((res) => {
+        if (!unmounted) {
+          setInfoPro(res.data);
+          setLoading(false);
+        }
+      }).catch((err) => { 
+        if(!unmounted){
+          setLoading(false);
+        }
+        if(axios.isCancel(err)){
+          console.log("request canceled:"+ err.message);
+        } else {
+          console.log("another error:" + err.message);
+        }
+      })
+    */
     result.forEach((item) => {
+      // axios
+      //   .get(`/api/productsInfo/product=${item._id}&distinct=size`)
+      //   .then((res) => {
+      //     if (!unmounted) {
+      //       setInfoSize(res.data);
+      //       setLoading(false);
+      //     }
+      //   }).catch((err) => {
+      //     if(!unmounted){
+      //       setLoading(false);
+      //     }
+      //     if(axios.isCancel(err)){
+      //       console.log("request canceled:"+ err.message);
+      //     } else {
+      //       console.log("another error:" + err.message);
+      //     }
+      //   });
       axios
-        .get(`/api/productsInfo/product=${item._id}&distinct=size`)
+        .get(`/api/productsInfo/v1/${item._id}`)
         .then((res) => {
-          setInfoSize(res.data);
+          if (!unmounted) {
+            setInfo(res.data[0]);
+            setLoading(false);
+          }
+        })
+        .catch((err) => {
+          if (!unmounted) {
+            setLoading(false);
+          }
+          if (axios.isCancel(err)) {
+            console.log("request canceled:" + err.message);
+          } else {
+            console.log("another error:" + err.message);
+          }
         });
     });
-    result.forEach((item) => {
-      axios
-        .get(`/api/productsInfo/product=${item._id}&distinct=color`)
-        .then((res) => {
-          setInfoColor(res.data);
-        });
-    });
+    // result.forEach((item) => {
+    //   axios
+    //     .get(`/api/productsInfo/product=${item._id}&distinct=color`)
+    //     .then((res) => {
+    //       setInfoColor(res.data);
+    //     });
+    // });
     // eslint-disable-nextLine react-hooks/exhaustive-deps
+    return () => {
+      unmounted = true;
+      source.cancel("Canceled in cleanup");
+    };
   }, [reload]);
   const handleSubmitOrder = (data) => {
     if (user && cartItems.length !== 0) {
@@ -216,7 +273,7 @@ const Cart = () => {
                 </p>
               </div>
               <div className="w-full mx-auto">
-                <button className="w-full py-3 font-semibold text-white transition-all bg-black rounded-2xl hover:bg-slate-300 hover:text-black">
+                <button className="w-full py-3 font-semibold text-white transition-all bg-black rounded-2xl hover:bg-[#d9d9d9] hover:text-black">
                   Đặt Hàng
                 </button>
               </div>
@@ -228,24 +285,30 @@ const Cart = () => {
                     cartItems.length > 0 &&
                     cartItems.map((item, index) => {
                       return (
-                        <CartItems
-                          data={item}
-                          size={infoSize}
-                          color={infoColor}
-                          key={Math.random() * 10000000}
-                          control={control}
-                          setValue={setValue}
-                          index={index}
-                          removeToCart={removeToCart}
-                          setCartItems={setCartItems}
-                          setValueCart={setValueCart}
-                          cartItems={cartItems}
-                          updateQuantityIncrement={updateQuantityIncrement}
-                          updateQuantityDecrement={updateQuantityDecrement}
-                          handleQuantityChange={handleQuantityChange}
-                          reload={reload}
-                          setReload={setReload}
-                        ></CartItems>
+                        <React.Fragment key={uuidv4()}>
+                          {loading && <SkeletonCartItem></SkeletonCartItem>}
+                          {!loading && (
+                            <CartItems
+                              data={item}
+                              size={infoSize}
+                              color={infoColor}
+                              info={info}
+                              key={uuidv4()}
+                              control={control}
+                              setValue={setValue}
+                              index={index}
+                              removeToCart={removeToCart}
+                              setCartItems={setCartItems}
+                              setValueCart={setValueCart}
+                              cartItems={cartItems}
+                              updateQuantityIncrement={updateQuantityIncrement}
+                              updateQuantityDecrement={updateQuantityDecrement}
+                              handleQuantityChange={handleQuantityChange}
+                              reload={reload}
+                              setReload={setReload}
+                            ></CartItems>
+                          )}
+                        </React.Fragment>
                       );
                     })}
                 </div>

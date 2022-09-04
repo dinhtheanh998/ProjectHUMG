@@ -25,6 +25,7 @@ const upload = multer({
   fileFilter: isImage,
 });
 
+// exports.uploadAImage = upload.single("image");
 exports.uploadImage = upload.array('images', 8)
 
 exports.list_all_tasks = (req, res) => {
@@ -35,8 +36,8 @@ exports.list_all_tasks = (req, res) => {
 };
 
 exports.create_a_task = (req, res, next) => {
+  console.log("upload multiple images", req.files);
   const imgArr = [];
-  console.log(req.files.length);
   for (let i = 0; i < req.files.length; i++) {
     imgArr.push(req.files[i].filename);
   }

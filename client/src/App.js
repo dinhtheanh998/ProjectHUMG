@@ -27,6 +27,7 @@ import ProfileUser from "./components/ProfileUser/ProfileUser";
 import ExchangeRequest from "./components/requestClient/ExchangeRequest";
 import Request from "./components/requestClient/Request";
 import ReturnRequest from "./components/requestClient/ReturnRequest";
+import Task from "./components/Task";
 
 function App() {
   return (
@@ -61,6 +62,7 @@ function App() {
             path="chinh-sach-doi-tra/doi-hang"
             element={<ExchangeRequest></ExchangeRequest>}
           ></Route>
+          <Route path="/task" element={<Task></Task>}></Route>
         </Route>
         {/* admin side */}
         <Route path="/admin" element={<BaseAdmin></BaseAdmin>}>

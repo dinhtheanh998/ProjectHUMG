@@ -21,6 +21,25 @@ exports.get_productInfo = (req, res) => {
       res.json(proInfo);
     });
 };
+exports.get_productInfo2 = (req, res) => {
+  console.log("productID", req.params.productID);
+  productInfo
+    .aggregate([
+      {
+        $match: { productID: new mongoose.Types.ObjectId(req.params.productID) },
+      },
+      {
+        $group: {
+          _id: "$productID",
+          size: { $addToSet: "$size" },
+          color: { $addToSet: "$color" },
+        }
+      }
+    ],(err, proInfo) => { 
+      if (err) res.send(err);
+      res.json(proInfo);
+    })
+};
 
 exports.get_a_proInfo = (req, res) => {
   productInfo.find(

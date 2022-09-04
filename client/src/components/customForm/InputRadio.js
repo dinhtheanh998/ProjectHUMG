@@ -5,7 +5,7 @@ const InputRadio = ({ control, ...props }) => {
   const { field } = useController({
     control,
     name: props.name,
-    defaultValue: "",
+    defaultValue: props.isAdmin,
   });
   return (
     <label

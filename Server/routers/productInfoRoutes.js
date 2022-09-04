@@ -11,6 +11,9 @@ router.get(
   "/?product=:productID&?distinct=:distinct",
   productInfoBuilder.get_productInfo
 );
+
+router.get("/v1/:productID", productInfoBuilder.get_productInfo2);
+
 router.post("/", productInfoBuilder.create_a_proInfo);
 
 router.get("/moreInfo", productInfoBuilder.infoAggregate);

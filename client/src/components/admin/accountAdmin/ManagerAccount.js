@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ReactDOM from "react-dom";
-import jwt_decode from "jwt-decode";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import {
@@ -14,19 +13,25 @@ import { loginSuccess } from "../../../redux/authSlice";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { createAxios } from "../../../createInstance";
-import { DELETESUCCESS, notifySuccess, notifyWarn, NOTPERMISSION } from "../../../config/config";
+import {
+  DELETESUCCESS,
+  notifySuccess,
+  notifyWarn,
+  NOTPERMISSION,
+} from "../../../config/config";
+import ViewInfo from "./ViewInfo";
 const ManagerAccount = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.login?.currentUser);
   const userList = useSelector((state) => state.users?.users?.allUsers);
   const notiDelete = useSelector((state) => state.users?.msg);
-  console.log(" notiDelete", notiDelete)  
   const { register, handleSubmit } = useForm();
   const [registerShow, setRegisterShow] = React.useState(false);
+  const [userInfo, setUserInfo] = React.useState();
+  const [infoShow, setInfoShow] = React.useState(false);
   const navigate = useNavigate();
   const [reload, setReload] = React.useState(false);
   let axiosJWT = createAxios(user, dispatch, loginSuccess);
-
 
   const handleOnSubmit = (data) => {
     axios
@@ -41,76 +46,96 @@ const ManagerAccount = () => {
       });
   };
 
-  const handleDelete = (id) => {    
+  const handleDelete = (id) => {
     deleteUser(user?.accessToken, dispatch, id, axiosJWT);
     if (notiDelete === NOTPERMISSION) {
       notifyWarn(notiDelete);
-    } else if(notiDelete === DELETESUCCESS){
+    } else if (notiDelete === DELETESUCCESS) {
       notifySuccess(notiDelete);
       setReload(!reload);
-    } 
+    }
   };
 
-  useEffect(() => {    
-      getAllUsers(user?.accessToken, dispatch, axiosJWT);    
+  useEffect(() => {
+    getAllUsers(user?.accessToken, dispatch, axiosJWT);
   }, [reload]);
   return (
     <BottomBodyAdm>
-      {user?.isAdmin && (
-        <button
-          type="button"
-          className="px-3 py-2 mb-5 font-semibold text-white bg-blue-400 rounded-lg"
-          onClick={() => {
-            setRegisterShow(true);
-          }}
-        >
-          Thêm tài khoản
-        </button>
-      )}
-      <table className="w-full">
-        <thead>
-          <tr>
-            <th className="w-10">STT</th>
-            <th className="w-[20%]">Tài Khoản</th>
-            <th className="">Email</th>
-            <th className="w-[100px]"></th>
-          </tr>
-        </thead>
-        {userList && (
-          <tbody className="font-semibold text-center">
-            {userList.map((user, index) => {
-              return (
-                <tr key={uuidv4()}>
-                  <td>{index + 1}</td>
-                  <td>{user.username}</td>
-                  <td>{user.email}</td>
-                  <td className="flex gap-x-5">
-                    <button className="px-4 py-2 font-semibold text-white bg-blue-300 rounded-lg text-normal">
-                      Xem
-                    </button>
-                    <button
-                      className="px-4 py-2 font-semibold text-white bg-red-300 rounded-lg text-normal"
-                      onClick={() => {
-                        handleDelete(user._id);
-                      }}
-                    >
-                      Xóa
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
+      <div className="py-5">
+        {user?.isAdmin && (
+          <button
+            type="button"
+            className="px-3 py-2 mb-5 font-semibold text-white bg-blue-400 rounded-lg"
+            onClick={() => {
+              setRegisterShow(true);
+            }}
+          >
+            Thêm tài khoản
+          </button>
         )}
-      </table>
-      {registerShow && (
-        <Register
-          register={register}
-          handleSubmit={handleSubmit}
-          handleOnSubmit={handleOnSubmit}
-          setRegisterShow={setRegisterShow}
-        ></Register>
-      )}
+        <table className="w-full">
+          <thead>
+            <tr>
+              <th className="w-10">STT</th>
+              <th className="w-[20%]">Tài Khoản</th>
+              <th className="">Email</th>
+              <th className="w-[100px]"></th>
+            </tr>
+          </thead>
+          {userList && (
+            <tbody className="font-semibold text-center">
+              {userList.map((user, index) => {
+                return (
+                  <tr key={uuidv4()}>
+                    <td>{index + 1}</td>
+                    <td>{user.username}</td>
+                    <td>{user.email}</td>
+                    <td className="flex gap-x-5">
+                      <button
+                        className="px-4 py-2 font-semibold text-white bg-blue-300 rounded-lg text-normal"
+                        onClick={() => {
+                          setInfoShow(true);
+                          setUserInfo(user);
+                          console.log(user);
+                        }}
+                      >
+                        Xem
+                      </button>
+                      <button
+                        className="px-4 py-2 font-semibold text-white bg-red-300 rounded-lg text-normal"
+                        onClick={() => {
+                          handleDelete(user._id);
+                        }}
+                      >
+                        Xóa
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          )}
+        </table>
+        {registerShow && (
+          <Register
+            register={register}
+            handleSubmit={handleSubmit}
+            handleOnSubmit={handleOnSubmit}
+            setRegisterShow={setRegisterShow}
+          ></Register>
+        )}
+        {infoShow && (
+          <ViewInfo
+            info={userInfo}
+            setReload={() => {
+              setReload(!reload);
+            }}
+            setInfoShow={() => {
+              setInfoShow(false);
+            }}
+          />
+        )}
+      </div>
     </BottomBodyAdm>
   );
 };
