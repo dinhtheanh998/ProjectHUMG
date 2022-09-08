@@ -1,0 +1,82 @@
+GET http://localhost:3001/api/order
+
+### Post Base
+POST http://localhost:3001/api/order HTTP/1.1
+content-type: application/json
+
+{
+    "fullName": "Dinh The Anh",
+    "phone": "0961494001",
+    "total": "180000",
+    "email":"quanglam@gmail.com",
+    "address":"Hanoi",
+    "details":[
+        {
+            "categories": "62cfc9ab5528b5fe3631467a",
+"color": "#ff0000",
+"description": "Anh đưa chiếc ô đã làm tim em có cầu vòng",
+"images": "image-1658560518577.jpeg",
+"name": "Lại là chia tay",
+"quantity": "2",
+"size": "S",
+"unitPrice": "100000",
+"unitPromotionalPrice": "90000",
+"__v": "0",
+"_id": "62dba006b78ac7e166e69aec"
+        },{
+            "name": "Lại là chia tay"
+        },{
+            "name": "Lại là chia tay"
+        }
+    ]
+}
+
+### Post Base
+POST http://localhost:3001/api/auth/register HTTP/1.1
+content-type: application/json
+
+{
+    "email": "themmde@gmail.com",
+    "password": "123456",
+    "username": "duclam"
+}
+
+### Post Base
+POST http://localhost:3001/api/auth/login HTTP/1.1
+content-Type: application/json
+
+{   
+    "username": "dinhtheanh",
+    "password": "123456",
+}
+
+### Post Base
+POST http://localhost:3001/api/auth/login HTTP/1.1
+content-Type: application/json
+
+{   
+    "username": "dinhtheanh",
+    "password": "123456",
+}
+
+
+### 
+POST http://localhost:3001/v1/auth/refresh HTTP/1.1 
+
+
+###
+
+POST http://localhost:3001/api/returnRequest HTTP/1.1
+content-Type: application/json
+
+{
+    "OrderId": "62e17b0dd4c5f4b749805dd4",
+    "bankAccount": "123456789",
+    "bankName": "ACB",
+    "accountHolder": "Dinh The Anh",
+    "bankBranch": "Hanoi",
+    "description": "Đổi sản phẩm",
+    "status": "pending",
+    "phone": "0961494001"
+
+}

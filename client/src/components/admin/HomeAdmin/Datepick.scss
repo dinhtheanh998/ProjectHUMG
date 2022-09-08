@@ -1,0 +1,10 @@
+.rs-calendar-header-title {
+    text-transform: capitalize;
+    font-size: 14px;
+}
+button.rs-btn.rs-btn-primary.rs-btn-sm{
+    background: #3498ff;
+    &:hover {
+        background: #1b6cbd;
+    }
+}
